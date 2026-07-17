@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<!-- saved from url=(0075)file:///C:/Users/nishc/Downloads/git-github-open-source-workflow%20(2).html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git, GitHub &amp; Open Source — Developer Workflow Cheat Sheet</title>
+<meta name="description" content="A single-page interactive cheat sheet: Git basics, GitHub collaboration, remotes &amp; merging, and your first open source contribution.">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --bg:#ffffff;
+  --bg-page:#eef2f8;
+  --bg-soft:#f8fafc;
+  --bg-soft-2:#eef2f9;
+  --border:#e2e8f0;
+  --navy:#0f172a;
+  --navy-soft:#475569;
+  --muted:#64748b;
+  --blue-50:#eff6ff;
+  --blue-500:#3b82f6;
+  --blue-600:#2563eb;
+  --blue-700:#1d4ed8;
+  --blue-900:#1e3a8a;
+  --gradient-hero:linear-gradient(135deg,#152a63 0%,#1e3a8a 30%,#2451c9 65%,#3b82f6 100%);
+  --green:#10b981;
+  --green-dark:#065f46;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  --code-bg:#0d1117;
+  --code-header:#161b22;
+  --code-border:#30363d;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:9px;
+  --shadow-md:0 16px 40px -14px rgba(15,23,42,.24);
+  --shadow-sm:0 4px 14px -6px rgba(15,23,42,.14);
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+
+/* ============================================================
+   RESET + BASE
+   ============================================================ */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0; font-family:var(--font-sans); color:var(--navy); background:var(--bg-page);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,p{ margin:0; }
+button{ font-family:inherit; }
+:focus-visible{ outline:2.5px solid var(--blue-600); outline-offset:2px; border-radius:4px; }
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+section,.card,.hero{ scroll-margin-top:104px; }
+
+.page::-webkit-scrollbar{ width:8px; }
+.checklist-items::-webkit-scrollbar,.search-results::-webkit-scrollbar{ width:8px; }
+.checklist-items::-webkit-scrollbar-thumb,.search-results::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:99px; }
+pre::-webkit-scrollbar{ height:6px; }
+pre::-webkit-scrollbar-thumb{ background:#30363d; border-radius:99px; }
+
+/* ============================================================
+   STICKY HEADER STACK
+   ============================================================ */
+.site-header{ position:sticky; top:0; z-index:60; background:rgba(255,255,255,.88); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--border); }
+.topbar{ display:flex; align-items:center; gap:16px; padding:10px 20px; border-bottom:1px solid var(--border); }
+.brand{ font-weight:800; font-size:14.5px; white-space:nowrap; letter-spacing:-.01em; }
+.topbar-center{ flex:1; display:flex; justify-content:center; min-width:0; }
+.search-wrap{ position:relative; width:100%; max-width:420px; }
+.search-icon{ position:absolute; left:11px; top:50%; transform:translateY(-50%); font-size:12px; opacity:.55; pointer-events:none; }
+#searchInput{ width:100%; padding:8px 12px 8px 30px; border:1px solid var(--border); border-radius:999px; font-size:12.5px; background:var(--bg-soft); color:var(--navy); outline:none; transition:.15s; }
+#searchInput:focus{ background:#fff; border-color:var(--blue-500); box-shadow:0 0 0 3px var(--blue-50); }
+.search-results{ position:absolute; top:calc(100% + 8px); left:0; right:0; background:#fff; border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow-md); max-height:280px; overflow-y:auto; display:none; z-index:100; }
+.search-results.show{ display:block; }
+.search-result-item{ padding:9px 12px; cursor:pointer; display:flex; flex-direction:column; gap:1px; font-size:12.5px; border-bottom:1px solid var(--border); }
+.search-result-item:last-child{ border-bottom:none; }
+.search-result-item:hover{ background:var(--bg-soft); }
+.search-result-cmd{ font-family:var(--font-mono); font-weight:700; color:var(--blue-700); }
+.search-result-desc{ color:var(--muted); font-size:11px; }
+.search-empty{ padding:12px; font-size:12.5px; color:var(--muted); }
+.icon-btn{ flex:0 0 auto; border:1px solid var(--border); background:#fff; border-radius:999px; padding:7px 12px; font-size:12.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; color:var(--navy); transition:.15s; }
+.icon-btn:hover{ background:var(--bg-soft); border-color:var(--blue-500); }
+
+.section-nav{ display:flex; gap:4px; justify-content:center; flex-wrap:wrap; padding:7px 16px; }
+.section-nav a{ font-size:11.5px; font-weight:700; color:var(--navy-soft); text-decoration:none; padding:6px 12px; border-radius:999px; transition:.15s; }
+.section-nav a:hover{ background:var(--bg-soft); color:var(--navy); }
+.section-nav a.active{ background:var(--blue-600); color:#fff; }
+
+.scroll-progress{ height:3px; background:var(--border); }
+.scroll-progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--blue-700),var(--blue-500)); }
+
+/* ============================================================
+   CENTERED PAGE SHEET
+   ============================================================ */
+.page-wrap{ max-width:980px; margin:26px auto 60px; padding:32px clamp(18px,4vw,46px) 54px; background:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); }
+
+/* ============================================================
+   SHARED: eyebrow, titles
+   ============================================================ */
+.section-eyebrow{ font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--blue-600); margin-bottom:8px; }
+.section-title{ font-size:clamp(19px,2.2vw,23px); font-weight:800; letter-spacing:-.01em; margin:0 0 12px; color:var(--navy); }
+.section-lede{ font-size:13px; color:var(--navy-soft); margin:-4px 0 14px; max-width:640px; line-height:1.55; }
+.mini-title{ font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; color:var(--navy-soft); margin:14px 0 8px; }
+.side-col .mini-title{ margin-top:0; }
+.block{ margin:44px 0; }
+.block:first-of-type{ margin-top:26px; }
+hr.divider{ border:none; border-top:1px solid var(--border); margin:0; }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{ background:var(--gradient-hero); border-radius:var(--radius-lg); color:#fff; box-shadow:var(--shadow-md); padding:clamp(20px,3vw,32px) clamp(20px,4vw,40px); position:relative; overflow:hidden; }
+.hero::after{ content:""; position:absolute; inset:0; background:radial-gradient(circle at 88% -15%,rgba(255,255,255,.28),transparent 55%); pointer-events:none; }
+.hero h1{ font-size:clamp(21px,2.8vw,32px); font-weight:800; line-height:1.16; letter-spacing:-.02em; margin:0 0 9px; position:relative; }
+.hero p{ font-size:clamp(12.5px,1.3vw,15px); opacity:.92; max-width:620px; margin:0 0 15px; position:relative; }
+.badges{ display:flex; flex-wrap:wrap; gap:8px; position:relative; }
+.badge{ background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); padding:5px 12px; border-radius:999px; font-size:11.5px; font-weight:700; }
+
+/* ============================================================
+   FLOW CHAIN
+   ============================================================ */
+.flow-chain{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:16px 0; }
+.flow-chain.compact .flow-step{ padding:5px 10px; font-size:11px; }
+.flow-step{ background:var(--bg-soft); border:1px solid var(--border); padding:6px 13px; border-radius:9px; font-size:12.5px; font-weight:700; color:var(--navy); white-space:nowrap; }
+.flow-step.cmd{ font-family:var(--font-mono); background:var(--code-bg); color:#79c0ff; border-color:var(--code-border); font-weight:600; }
+.flow-step.accent{ background:var(--blue-600); border-color:var(--blue-600); color:#fff; }
+.flow-arrow{ color:var(--muted); font-weight:700; font-size:13px; flex:0 0 auto; }
+
+/* ============================================================
+   GRIDS / CARDS
+   ============================================================ */
+.grid-2{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:16px; }
+.grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.grid-main-side{ display:grid; grid-template-columns:1.6fr 1fr; gap:16px; align-items:start; margin:14px 0; }
+
+.card{ background:var(--bg-soft); border:1px solid var(--border); border-radius:var(--radius-md); padding:14px; }
+.card h3{ font-size:13.5px; font-weight:800; margin:0 0 4px; }
+.card p.desc{ font-size:12px; color:var(--navy-soft); margin:0 0 9px; line-height:1.45; }
+
+.problem-card{ background:var(--bg-soft); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px; }
+.problem-card h4{ font-size:11.5px; font-weight:800; margin:0 0 6px; }
+
+.side-col{ display:flex; flex-direction:column; }
+
+/* ============================================================
+   CODE BLOCKS
+   ============================================================ */
+.code-block{ background:var(--code-bg); border:1px solid var(--code-border); border-radius:12px; overflow:hidden; font-size:13px; }
+.code-block.small{ font-size:11.5px; }
+.code-header{ display:flex; align-items:center; justify-content:space-between; padding:6px 10px; background:var(--code-header); border-bottom:1px solid var(--code-border); }
+.code-block.small .code-header{ padding:4px 8px; }
+.code-lang{ color:#8b949e; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; display:flex; align-items:center; gap:6px; }
+.code-lang::before{ content:"●"; color:#3fb950; font-size:8px; }
+.copy-btn{ background:transparent; border:1px solid var(--code-border); color:#c9d1d9; font-size:10.5px; padding:3px 9px; border-radius:6px; cursor:pointer; font-weight:600; transition:.15s; }
+.copy-btn:hover{ background:#21262d; }
+.copy-btn.copied{ background:var(--green); border-color:var(--green); color:#04241a; }
+.code-block pre{ margin:0; padding:11px 14px; overflow-x:auto; }
+.code-block.small pre{ padding:8px 10px; }
+.code-block code{ font-family:var(--font-mono); color:#c9d1d9; line-height:1.6; white-space:pre; }
+.tok-comment{ color:#8b949e; font-style:italic; }
+.tok-string{ color:#a5d6ff; }
+.tok-cmd{ color:#79c0ff; font-weight:700; }
+.tok-git{ color:#ff7b72; font-weight:700; }
+.tok-flag{ color:#d2a8ff; }
+.tok-ph{ color:#ffa657; }
+
+/* ============================================================
+   WARNING / TIP BOXES
+   ============================================================ */
+.warning-box{ margin-top:10px; background:#fff7ed; border:1px solid #fed7aa; border-left:4px solid var(--amber); border-radius:10px; padding:11px 14px; display:flex; align-items:center; gap:10px; font-size:12.5px; color:#7c2d12; }
+.warning-box strong{ color:#9a3412; }
+.tip-box{ margin:14px 0; background:var(--blue-50); border:1px solid #bfdbfe; border-left:4px solid var(--blue-600); border-radius:10px; padding:11px 14px; display:flex; align-items:flex-start; gap:10px; font-size:12.5px; color:#1e3a5f; line-height:1.5; }
+.tip-box strong{ color:var(--blue-700); }
+.inline-code{ font-family:var(--font-mono); background:var(--code-bg); color:#ff7b72; padding:2px 7px; border-radius:6px; font-size:11.5px; }
+
+/* ============================================================
+   PR TIMELINE
+   ============================================================ */
+.pr-timeline{ display:flex; flex-direction:column; gap:7px; }
+.pr-stage{ display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:9px; background:var(--bg-soft); border:1px solid var(--border); font-size:12px; font-weight:700; }
+.pr-stage .dot2{ width:7px; height:7px; border-radius:50%; background:var(--blue-500); flex:0 0 auto; }
+.pr-stage.changes .dot2{ background:var(--amber); }
+.pr-stage.merge{ background:#ecfdf5; border-color:#a7f3d0; }
+.pr-stage.merge .dot2{ background:var(--green); }
+
+/* ============================================================
+   REMOTE CARDS
+   ============================================================ */
+.remote-cards{ display:flex; flex-direction:column; gap:9px; }
+.remote-card{ display:flex; align-items:center; gap:10px; padding:11px; border-radius:11px; border:1px solid var(--border); background:var(--bg-soft); font-size:12.5px; }
+.remote-card .tag{ font-family:var(--font-mono); font-weight:800; font-size:12px; padding:4px 10px; border-radius:8px; color:#fff; flex:0 0 auto; }
+.remote-card.origin .tag{ background:var(--blue-600); }
+.remote-card.upstream .tag{ background:var(--navy); }
+.remote-caption{ font-size:11.5px; color:var(--muted); margin-top:8px; line-height:1.5; }
+
+/* ============================================================
+   CHEAT GRID
+   ============================================================ */
+.cheat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.cheat-item{ display:flex; flex-direction:column; gap:3px; background:var(--code-bg); border:1px solid var(--code-border); border-radius:10px; padding:9px 11px; cursor:pointer; transition:.15s; }
+.cheat-item:hover{ border-color:var(--blue-500); }
+.cheat-item.copied-flash{ background:#052e1a; border-color:var(--green); }
+.cheat-cmd{ font-family:var(--font-mono); color:#79c0ff; font-weight:700; font-size:11.5px; }
+.cheat-desc{ color:#8b949e; font-size:10.5px; }
+
+/* ============================================================
+   RIBBON
+   ============================================================ */
+.ribbon{ margin-top:14px; background:var(--navy); border-radius:14px; padding:13px 16px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; justify-content:center; }
+.ribbon .flow-step{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.18); color:#fff; }
+.ribbon .flow-arrow{ color:rgba(255,255,255,.45); }
+
+/* ============================================================
+   FLASH
+   ============================================================ */
+@keyframes flashPulse{ 0%{ box-shadow:0 0 0 3px var(--blue-500); } 100%{ box-shadow:0 0 0 0 rgba(59,130,246,0); } }
+.flash{ animation:flashPulse 1.1s ease; }
+
+/* ============================================================
+   CHECKLIST PANEL
+   ============================================================ */
+.overlay{ position:fixed; inset:0; background:rgba(15,23,42,.35); z-index:150; display:none; }
+.overlay.show{ display:block; }
+.checklist-panel{ position:fixed; top:0; right:-340px; width:320px; max-width:88vw; height:100%; background:#fff; border-left:1px solid var(--border); box-shadow:-14px 0 34px rgba(15,23,42,.18); z-index:200; transition:right .3s ease; display:flex; flex-direction:column; padding:18px; }
+.checklist-panel.open{ right:0; }
+.checklist-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+.checklist-header h3{ font-size:15px; font-weight:800; }
+#closeChecklist{ border:none; background:transparent; font-size:15px; cursor:pointer; color:var(--muted); padding:4px; }
+.checklist-progress-track{ height:6px; background:var(--border); border-radius:99px; margin:10px 0 14px; overflow:hidden; }
+.checklist-progress-fill{ height:100%; background:var(--green); width:0%; transition:width .3s; }
+.checklist-items{ display:flex; flex-direction:column; gap:6px; overflow-y:auto; flex:1; }
+.checklist-item{ display:flex; align-items:center; gap:10px; font-size:12.5px; padding:8px; border-radius:8px; cursor:pointer; }
+.checklist-item:hover{ background:var(--bg-soft); }
+.checklist-item input{ width:16px; height:16px; accent-color:var(--green); flex:0 0 auto; }
+.checklist-item.checked span{ text-decoration:line-through; color:var(--muted); }
+.checklist-complete{ font-size:12px; font-weight:700; color:var(--green-dark); margin-top:8px; display:none; }
+.checklist-note{ font-size:10.5px; color:var(--muted); margin-top:10px; border-top:1px solid var(--border); padding-top:10px; line-height:1.5; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1000px){
+  .grid-main-side{ grid-template-columns:1fr; }
+}
+@media (max-width:900px){
+  .grid-3{ grid-template-columns:1fr 1fr; }
+  .grid-4{ grid-template-columns:1fr 1fr; }
+  .cheat-grid{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:640px){
+  .grid-2{ grid-template-columns:1fr; }
+  .grid-3{ grid-template-columns:1fr; }
+  .grid-4{ grid-template-columns:1fr; }
+  .cheat-grid{ grid-template-columns:1fr; }
+  .topbar{ flex-wrap:wrap; padding:8px 14px; }
+  .topbar-center{ order:3; width:100%; }
+  .search-wrap{ max-width:100%; }
+  .badges{ gap:6px; }
+  .badge{ font-size:10.5px; padding:4px 9px; }
+  .page-wrap{ margin:12px auto 40px; border-radius:16px; padding:20px 16px 40px; }
+  .section-nav{ overflow-x:auto; justify-content:flex-start; }
+}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <header class="topbar">
+    <span class="brand">🐙 Git Workflow Cheat Sheet</span>
+    <div class="topbar-center">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search commands (e.g. revert, merge, remote)" autocomplete="off">
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+    <button id="checklistToggle" class="icon-btn" title="Track your progress" aria-label="Open progress checklist">✅ <span id="checklistCount">0/12</span></button>
+  </header>
+  <nav class="section-nav" id="sectionNav">
+    <a href="file:///C:/Users/nishc/Downloads/git-github-open-source-workflow%20(2).html#basics">Basics</a>
+    <a href="file:///C:/Users/nishc/Downloads/git-github-open-source-workflow%20(2).html#collaborate">Collaborate</a>
+    <a href="file:///C:/Users/nishc/Downloads/git-github-open-source-workflow%20(2).html#remotes">Remotes</a>
+    <a href="file:///C:/Users/nishc/Downloads/git-github-open-source-workflow%20(2).html#opensource">Open Source</a>
+    <a href="file:///C:/Users/nishc/Downloads/git-github-open-source-workflow%20(2).html#cheatsheet">Cheat Sheet</a>
+  </nav>
+  <div class="scroll-progress"><div class="scroll-progress-fill" id="scrollProgressFill" style="width: 0%;"></div></div>
+</div>
+
+<main class="page-wrap">
+
+  <div class="hero">
+    <h1>Ultimate Git, GitHub &amp; Open Source<br>Developer Workflow Cheat Sheet</h1>
+    <p>From your first local commit to contributing to real open-source projects.</p>
+    <div class="badges">
+      <span class="badge">📖 Practical Workflow</span>
+      <span class="badge">🐙 Git + GitHub</span>
+      <span class="badge">🌍 Open Source</span>
+      <span class="badge">📈 Beginner → Advanced</span>
+    </div>
+  </div>
+
+  <!-- ================= GIT BASICS ================= -->
+  <section class="block" id="basics">
+    <div class="section-eyebrow">Git Basics</div>
+    <h2 class="section-title">Your Daily Git Workflow</h2>
+
+    <div class="flow-chain">
+      <span class="flow-step">Write Code</span><span class="flow-arrow">→</span>
+      <span class="flow-step cmd">git status</span><span class="flow-arrow">→</span>
+      <span class="flow-step cmd">git add</span><span class="flow-arrow">→</span>
+      <span class="flow-step">Staging Area</span><span class="flow-arrow">→</span>
+      <span class="flow-step cmd">git commit</span><span class="flow-arrow">→</span>
+      <span class="flow-step">Local Repository</span><span class="flow-arrow">→</span>
+      <span class="flow-step cmd">git push</span><span class="flow-arrow">→</span>
+      <span class="flow-step accent">GitHub</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card" id="cmd-config">
+        <h3>1 · Configure Git</h3>
+        <p class="desc">Tell Git who you are — done once per machine.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">config</span> <span class="tok-flag">--global</span> user.name <span class="tok-string">"Your Name"</span>
+<span class="tok-git">git</span> <span class="tok-cmd">config</span> <span class="tok-flag">--global</span> user.email <span class="tok-string">"you@example.com"</span></code></pre>
+        </div>
+      </div>
+
+      <div class="card" id="cmd-init">
+        <h3>2 · Create or Clone a Repo</h3>
+        <p class="desc">Start fresh, or copy an existing project locally.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">init</span>                      <span class="tok-comment"># start a new repo</span>
+<span class="tok-comment"># or</span>
+<span class="tok-git">git</span> <span class="tok-cmd">clone</span> <span class="tok-ph">&lt;repository-url&gt;</span>    <span class="tok-comment"># copy an existing one</span></code></pre>
+        </div>
+      </div>
+
+      <div class="card" id="cmd-daily">
+        <h3>3 · Daily Workflow</h3>
+        <p class="desc">The loop you'll repeat dozens of times a day.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">status</span>
+<span class="tok-git">git</span> <span class="tok-cmd">diff</span>
+<span class="tok-git">git</span> <span class="tok-cmd">add</span> .
+<span class="tok-git">git</span> <span class="tok-cmd">commit</span> <span class="tok-flag">-m</span> <span class="tok-string">"Add user authentication"</span>
+<span class="tok-git">git</span> <span class="tok-cmd">push</span> <span class="tok-flag">-u</span> origin main        <span class="tok-comment"># -u only needed the first time</span></code></pre>
+        </div>
+      </div>
+
+      <div class="card" id="cmd-branch">
+        <h3>4 · Branch Workflow</h3>
+        <p class="desc">Isolate new work from main so it stays shippable.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">switch</span> <span class="tok-flag">-c</span> feature/user-auth
+<span class="tok-comment"># older equivalent:</span>
+<span class="tok-git">git</span> <span class="tok-cmd">checkout</span> <span class="tok-flag">-b</span> feature/user-auth</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ================= GITHUB COLLABORATION ================= -->
+  <section class="block" id="collaborate">
+    <div class="section-eyebrow">GitHub Collaboration</div>
+    <h2 class="section-title">From Feature Branch to Pull Request</h2>
+
+    <div class="flow-chain compact">
+      <span class="flow-step">main</span><span class="flow-arrow">→</span>
+      <span class="flow-step">feature branch</span><span class="flow-arrow">→</span>
+      <span class="flow-step">write code</span><span class="flow-arrow">→</span>
+      <span class="flow-step">test</span><span class="flow-arrow">→</span>
+      <span class="flow-step">commit</span><span class="flow-arrow">→</span>
+      <span class="flow-step">push</span><span class="flow-arrow">→</span>
+      <span class="flow-step accent">Pull Request</span><span class="flow-arrow">→</span>
+      <span class="flow-step">Code Review</span><span class="flow-arrow">→</span>
+      <span class="flow-step accent">Merge</span>
+    </div>
+
+    <div class="grid-main-side">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+        <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">switch</span> main
+<span class="tok-git">git</span> <span class="tok-cmd">pull</span> origin main
+
+<span class="tok-git">git</span> <span class="tok-cmd">switch</span> <span class="tok-flag">-c</span> feature/payment-system
+
+<span class="tok-comment"># write and test code</span>
+
+<span class="tok-git">git</span> <span class="tok-cmd">status</span>
+<span class="tok-git">git</span> <span class="tok-cmd">diff</span>
+<span class="tok-git">git</span> <span class="tok-cmd">add</span> .
+<span class="tok-git">git</span> <span class="tok-cmd">commit</span> <span class="tok-flag">-m</span> <span class="tok-string">"Add payment integration"</span>
+
+<span class="tok-git">git</span> <span class="tok-cmd">push</span> <span class="tok-flag">-u</span> origin feature/payment-system</code></pre>
+      </div>
+
+      <div class="side-col">
+        <h4 class="mini-title">Pull Request Lifecycle</h4>
+        <div class="pr-timeline">
+          <div class="pr-stage"><span class="dot2"></span>Pull Request</div>
+          <div class="pr-stage"><span class="dot2"></span>Review</div>
+          <div class="pr-stage changes"><span class="dot2"></span>Requested Changes</div>
+          <div class="pr-stage"><span class="dot2"></span>Approval</div>
+          <div class="pr-stage merge"><span class="dot2"></span>Merge</div>
+        </div>
+      </div>
+    </div>
+
+    <h4 class="mini-title">Common Hiccups</h4>
+    <div class="grid-4">
+      <div class="problem-card">
+        <h4>Remote rejected</h4>
+        <div class="code-block small">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">pull</span> <span class="tok-flag">--rebase</span> origin main
+<span class="tok-git">git</span> <span class="tok-cmd">push</span> origin main</code></pre>
+        </div>
+      </div>
+      <div class="problem-card">
+        <h4>Unstage a file</h4>
+        <div class="code-block small">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">restore</span> <span class="tok-flag">--staged</span> <span class="tok-ph">&lt;file&gt;</span></code></pre>
+        </div>
+      </div>
+      <div class="problem-card">
+        <h4>Discard changes</h4>
+        <div class="code-block small">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">restore</span> <span class="tok-ph">&lt;file&gt;</span></code></pre>
+        </div>
+      </div>
+      <div class="problem-card">
+        <h4>Merge conflict</h4>
+        <div class="code-block small">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-comment"># fix the conflict manually</span>
+<span class="tok-git">git</span> <span class="tok-cmd">add</span> .
+<span class="tok-git">git</span> <span class="tok-cmd">commit</span> <span class="tok-flag">-m</span> <span class="tok-string">"Resolve merge conflict"</span>
+<span class="tok-git">git</span> <span class="tok-cmd">push</span> origin main</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-box">⚠️ <span><strong>Be careful with</strong> <span class="inline-code">git reset --hard</span> — it permanently discards uncommitted work.</span></div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ================= REMOTES, FETCH & MERGE ================= -->
+  <section class="block" id="remotes">
+    <div class="section-eyebrow">Staying In Sync</div>
+    <h2 class="section-title">Remotes, Fetch &amp; Merge</h2>
+    <p class="section-lede"><span class="inline-code" style="background:var(--bg-soft);color:var(--blue-700);">git pull</span> is really just <span class="inline-code" style="background:var(--bg-soft);color:var(--blue-700);">git fetch</span> + <span class="inline-code" style="background:var(--bg-soft);color:var(--blue-700);">git merge</span> in one step. Here's what's happening underneath, plus a few remote commands worth knowing.</p>
+
+    <div class="grid-3">
+      <div class="card" id="cmd-remote-v">
+        <h3>See Your Remotes</h3>
+        <p class="desc">List them, then refresh tracking info for all of them at once.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">remote</span> <span class="tok-flag">-v</span>
+<span class="tok-git">git</span> <span class="tok-cmd">fetch</span> <span class="tok-flag">--all</span></code></pre>
+        </div>
+      </div>
+
+      <div class="card" id="cmd-merge">
+        <h3>Fetch + Merge = Pull</h3>
+        <p class="desc">Two steps you can also run separately, when you want to inspect before merging.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">fetch</span> upstream
+<span class="tok-git">git</span> <span class="tok-cmd">merge</span> upstream/main
+<span class="tok-comment"># same result as:</span>
+<span class="tok-git">git</span> <span class="tok-cmd">pull</span> upstream main</code></pre>
+        </div>
+      </div>
+
+      <div class="card" id="cmd-push-head">
+        <h3>Push to a Named Branch</h3>
+        <p class="desc">Handy when your local branch name doesn't match the remote.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">push</span> origin HEAD:fix/typo</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ================= OPEN SOURCE ================= -->
+  <section class="block" id="opensource">
+    <div class="section-eyebrow">Open Source</div>
+    <h2 class="section-title">Your First Open Source Contribution</h2>
+
+    <div class="flow-chain compact">
+      <span class="flow-step">Find Project</span><span class="flow-arrow">→</span>
+      <span class="flow-step">Read README</span><span class="flow-arrow">→</span>
+      <span class="flow-step">Check CONTRIBUTING.md</span><span class="flow-arrow">→</span>
+      <span class="flow-step">Find Issue</span><span class="flow-arrow">→</span>
+      <span class="flow-step accent">Fork</span><span class="flow-arrow">→</span>
+      <span class="flow-step cmd">Clone</span><span class="flow-arrow">→</span>
+      <span class="flow-step">Create Branch</span><span class="flow-arrow">→</span>
+      <span class="flow-step">Code + Test</span><span class="flow-arrow">→</span>
+      <span class="flow-step cmd">Push</span><span class="flow-arrow">→</span>
+      <span class="flow-step accent">Pull Request</span><span class="flow-arrow">→</span>
+      <span class="flow-step">Review</span><span class="flow-arrow">→</span>
+      <span class="flow-step accent">Merge</span>
+    </div>
+
+    <div class="tip-box">💡 <span><strong>Before opening an issue:</strong> search existing issues first so you're not filing a duplicate. When you do file one, include a clear summary, exact steps to reproduce, and a screenshot if it's visual — maintainers can act on it much faster.</span></div>
+
+    <div class="grid-main-side">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn">Copy</button></div>
+        <pre><code class="language-bash"><span class="tok-git">git</span> <span class="tok-cmd">clone</span> <span class="tok-ph">&lt;your-fork-url&gt;</span>
+
+<span class="tok-git">git</span> <span class="tok-cmd">remote</span> add upstream <span class="tok-ph">&lt;original-repository-url&gt;</span>
+<span class="tok-git">git</span> <span class="tok-cmd">fetch</span> upstream
+
+<span class="tok-git">git</span> <span class="tok-cmd">switch</span> main
+<span class="tok-git">git</span> <span class="tok-cmd">pull</span> upstream main
+
+<span class="tok-git">git</span> <span class="tok-cmd">switch</span> <span class="tok-flag">-c</span> fix/documentation
+
+<span class="tok-comment"># make changes</span>
+
+<span class="tok-git">git</span> <span class="tok-cmd">add</span> .
+<span class="tok-git">git</span> <span class="tok-cmd">commit</span> <span class="tok-flag">-m</span> <span class="tok-string">"Improve documentation"</span>
+
+<span class="tok-git">git</span> <span class="tok-cmd">push</span> origin fix/documentation</code></pre>
+      </div>
+
+      <div class="side-col">
+        <h4 class="mini-title">Two Remotes, One Repo</h4>
+        <div class="remote-cards">
+          <div class="remote-card origin"><span class="tag">origin</span><span>Your GitHub fork</span></div>
+          <div class="remote-card upstream"><span class="tag">upstream</span><span>The original project</span></div>
+        </div>
+        <p class="remote-caption">Keeping <strong>upstream</strong> synced means your fork — and your pull requests — never drift far from the real project.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ================= CHEAT SHEET ================= -->
+<section class="block" id="cheatsheet">
+  <div class="section-eyebrow">Quick Reference</div>
+
+  <h2 class="section-title">
+    Quick Reference
+    <span style="font-weight:500;color:var(--muted);font-size:12px;">
+      — click any command to copy
+    </span>
+  </h2>
+
+  <div class="cheat-grid" id="cheatGrid">
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git status</span>
+      <span class="cheat-desc">Check changed files</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git diff</span>
+      <span class="cheat-desc">Review code changes</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git add .</span>
+      <span class="cheat-desc">Stage all changes</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git commit -m "Add user authentication"</span>
+      <span class="cheat-desc">Create a commit</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git push -u origin main</span>
+      <span class="cheat-desc">First push + set upstream</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git push</span>
+      <span class="cheat-desc">Push future changes</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git pull origin main</span>
+      <span class="cheat-desc">Get latest changes</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git fetch origin</span>
+      <span class="cheat-desc">Download remote updates</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git merge feature/auth</span>
+      <span class="cheat-desc">Merge a branch</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git switch feature/auth</span>
+      <span class="cheat-desc">Switch to existing branch</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git switch -c feature/auth</span>
+      <span class="cheat-desc">Create + switch branch</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git branch -d feature/auth</span>
+      <span class="cheat-desc">Delete local branch</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git restore app.py</span>
+      <span class="cheat-desc">Discard file changes</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git stash push -m "WIP"</span>
+      <span class="cheat-desc">Temporarily save changes</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git stash pop</span>
+      <span class="cheat-desc">Restore stashed changes</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git log --oneline</span>
+      <span class="cheat-desc">View commit history</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git revert abc1234</span>
+      <span class="cheat-desc">Safely undo a commit</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git remote -v</span>
+      <span class="cheat-desc">View GitHub remote</span>
+    </div>
+
+    <div class="cheat-item" tabindex="0" title="Click to copy">
+      <span class="cheat-cmd">git remote add origin URL</span>
+      <span class="cheat-desc">Connect local repo to GitHub</span>
+    </div>
+
+  </div>
+
+  <div class="ribbon">
+    <span class="flow-step">Code</span>
+    <span class="flow-arrow">→</span>
+
+    <span class="flow-step">Status</span>
+    <span class="flow-arrow">→</span>
+
+    <span class="flow-step">Diff</span>
+    <span class="flow-arrow">→</span>
+
+    <span class="flow-step">Add</span>
+    <span class="flow-arrow">→</span>
+
+    <span class="flow-step">Commit</span>
+    <span class="flow-arrow">→</span>
+
+    <span class="flow-step">Push</span>
+    <span class="flow-arrow">→</span>
+
+    <span class="flow-step">Pull Request</span>
+    <span class="flow-arrow">→</span>
+
+    <span class="flow-step">Review</span>
+    <span class="flow-arrow">→</span>
+
+    <span class="flow-step">Merge</span>
+  </div>
+</section>
+
+</main>
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="checklist-panel" id="checklistPanel" aria-label="Progress checklist">
+
+  <div class="checklist-header">
+    <h3>🧭 Progress Checklist</h3>
+    <button id="closeChecklist" aria-label="Close checklist">✕</button>
+  </div>
+
+  <div class="checklist-progress-track">
+    <div class="checklist-progress-fill" id="checklistFill" style="width: 0%;"></div>
+  </div>
+
+  <div class="checklist-items" id="checklistItems"><label class="checklist-item" for="chk-0"><input type="checkbox" id="chk-0"><span>Configure Git username &amp; email</span></label><label class="checklist-item" for="chk-1"><input type="checkbox" id="chk-1"><span>Initialize or clone a repository</span></label><label class="checklist-item" for="chk-2"><input type="checkbox" id="chk-2"><span>Make your first commit</span></label><label class="checklist-item" for="chk-3"><input type="checkbox" id="chk-3"><span>Push commits to GitHub</span></label><label class="checklist-item" for="chk-4"><input type="checkbox" id="chk-4"><span>Create a feature branch</span></label><label class="checklist-item" for="chk-5"><input type="checkbox" id="chk-5"><span>Open your first Pull Request</span></label><label class="checklist-item" for="chk-6"><input type="checkbox" id="chk-6"><span>Resolve a merge conflict</span></label><label class="checklist-item" for="chk-7"><input type="checkbox" id="chk-7"><span>Fork an open source repo</span></label><label class="checklist-item" for="chk-8"><input type="checkbox" id="chk-8"><span>Add an upstream remote</span></label><label class="checklist-item" for="chk-9"><input type="checkbox" id="chk-9"><span>Sync your fork with upstream</span></label><label class="checklist-item" for="chk-10"><input type="checkbox" id="chk-10"><span>Submit an open source PR</span></label><label class="checklist-item" for="chk-11"><input type="checkbox" id="chk-11"><span>Get a PR merged</span></label></div>
+
+  <p class="checklist-complete" id="checklistComplete" style="display: none;">
+    🎉 Full workflow complete — nice work!
+  </p>
+
+  <p class="checklist-note">
+    Kept in memory for this session only — this is a static file with no backend,
+    so it resets on reload.
+  </p>
+
+</aside>
+
+<script>
+(function(){
+  "use strict";
+
+
+
+  /* ============================================================
+     UTILITIES
+     ============================================================ */
+  function escapeHtml(str){
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function fallbackCopy(text, cb){
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { document.execCommand("copy"); } catch(e){}
+    document.body.removeChild(ta);
+    cb();
+  }
+
+  function copyToClipboard(text, onDone){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onDone).catch(function(){ fallbackCopy(text, onDone); });
+    } else {
+      fallbackCopy(text, onDone);
+    }
+  }
+
+  /* ============================================================
+     BASH SYNTAX HIGHLIGHTING
+     ============================================================ */
+  var GIT_SUBCOMMANDS = ["status","diff","add","commit","push","pull","fetch","switch","branch","restore","stash","log","clone","init","config","remote","reset","merge","revert","checkout"];
+
+  function highlightLine(line){
+    if (line.trim() === "") return "";
+    var hashIdx = line.indexOf("#");
+    var codePart = hashIdx === -1 ? line : line.slice(0, hashIdx);
+    var commentPart = hashIdx === -1 ? "" : line.slice(hashIdx);
+
+    var out = "";
+    var rest = codePart;
+
+    var gitMatch = codePart.match(/^(\s*)(git)(\s+)([a-z][a-z-]*)?/);
+    if (gitMatch) {
+      var lead = gitMatch[1] || "";
+      var sub = gitMatch[4];
+      out += escapeHtml(lead) + '<span class="tok-git">git</span>' + escapeHtml(gitMatch[3] || "");
+      if (sub && GIT_SUBCOMMANDS.indexOf(sub) !== -1) {
+        out += '<span class="tok-cmd">' + escapeHtml(sub) + '</span>';
+      } else if (sub) {
+        out += escapeHtml(sub);
+      }
+      rest = codePart.slice(gitMatch[0].length);
+    }
+
+    var tokenRe = /(<[^<>]+>)|("[^"]*")|(^|\s)(--?[a-zA-Z][\w-]*)/g;
+    var lastIndex = 0;
+    var m;
+    while ((m = tokenRe.exec(rest)) !== null) {
+      out += escapeHtml(rest.slice(lastIndex, m.index));
+      if (m[1]) {
+        out += '<span class="tok-ph">' + escapeHtml(m[1]) + '</span>';
+      } else if (m[2]) {
+        out += '<span class="tok-string">' + escapeHtml(m[2]) + '</span>';
+      } else if (m[4]) {
+        out += escapeHtml(m[3]) + '<span class="tok-flag">' + escapeHtml(m[4]) + '</span>';
+      }
+      lastIndex = tokenRe.lastIndex;
+      if (m[0].length === 0) { tokenRe.lastIndex++; }
+    }
+    out += escapeHtml(rest.slice(lastIndex));
+
+    var commentHtml = commentPart ? '<span class="tok-comment">' + escapeHtml(commentPart) + '</span>' : "";
+    return out + commentHtml;
+  }
+
+  function highlightBash(raw){
+    return raw.split("\n").map(highlightLine).join("\n");
+  }
+
+  document.querySelectorAll("code.language-bash").forEach(function(codeEl){
+    codeEl.innerHTML = highlightBash(codeEl.textContent);
+  });
+
+  /* ============================================================
+     COPY BUTTONS (code blocks)
+     ============================================================ */
+  document.querySelectorAll(".copy-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var codeEl = btn.closest(".code-block").querySelector("code");
+      var text = codeEl.textContent;
+      var original = btn.textContent;
+      copyToClipboard(text, function(){
+        btn.textContent = "✓ Copied";
+        btn.classList.add("copied");
+        setTimeout(function(){ btn.textContent = original; btn.classList.remove("copied"); }, 1500);
+      });
+    });
+  });
+
+  /* ============================================================
+     COPY ON CLICK (cheat sheet chips)
+     ============================================================ */
+  document.querySelectorAll(".cheat-item").forEach(function(item){
+    item.setAttribute("tabindex", "0");
+    item.title = "Click to copy";
+    function trigger(){
+      var cmd = item.querySelector(".cheat-cmd").textContent;
+      var descEl = item.querySelector(".cheat-desc");
+      var original = descEl.textContent;
+      copyToClipboard(cmd, function(){
+        descEl.textContent = "Copied ✓";
+        item.classList.add("copied-flash");
+        setTimeout(function(){ descEl.textContent = original; item.classList.remove("copied-flash"); }, 1300);
+      });
+    }
+    item.addEventListener("click", trigger);
+    item.addEventListener("keydown", function(e){
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); trigger(); }
+    });
+  });
+
+  /* ============================================================
+     SEARCH
+     ============================================================ */
+  var COMMAND_INDEX = [
+    {cmd:"git config", desc:"Set your name & email", target:"cmd-config"},
+    {cmd:"git init", desc:"Start a new local repo", target:"cmd-init"},
+    {cmd:"git clone", desc:"Copy a repo locally", target:"cmd-init"},
+    {cmd:"git status", desc:"See what changed", target:"cmd-daily"},
+    {cmd:"git diff", desc:"Review line-by-line changes", target:"cmd-daily"},
+    {cmd:"git add", desc:"Stage changes for commit", target:"cmd-daily"},
+    {cmd:"git commit", desc:"Save a snapshot locally", target:"cmd-daily"},
+    {cmd:"git push -u origin", desc:"Upload commits, set upstream", target:"cmd-daily"},
+    {cmd:"git switch -c", desc:"Create or change a branch", target:"cmd-branch"},
+    {cmd:"git checkout -b", desc:"Classic way to create a branch", target:"cmd-branch"},
+    {cmd:"git pull --rebase", desc:"Fix a rejected push", target:"collaborate"},
+    {cmd:"git restore --staged", desc:"Unstage a file", target:"collaborate"},
+    {cmd:"git restore", desc:"Discard local changes", target:"collaborate"},
+    {cmd:"git reset --hard", desc:"⚠️ Permanently discards work", target:"collaborate"},
+    {cmd:"git remote -v", desc:"List your remotes", target:"cmd-remote-v"},
+    {cmd:"git fetch --all", desc:"Update tracking for every remote", target:"cmd-remote-v"},
+    {cmd:"git merge", desc:"Combine branches together", target:"cmd-merge"},
+    {cmd:"git push origin HEAD", desc:"Push to a specific remote branch name", target:"cmd-push-head"},
+    {cmd:"git remote add upstream", desc:"Link the original repo", target:"opensource"},
+    {cmd:"git fetch upstream", desc:"Download upstream history", target:"opensource"},
+    {cmd:"git branch", desc:"List / manage branches", target:"cheatsheet"},
+    {cmd:"git stash", desc:"Temporarily shelve changes", target:"cheatsheet"},
+    {cmd:"git log", desc:"View commit history", target:"cheatsheet"},
+    {cmd:"git revert", desc:"Safely undo a commit", target:"cheatsheet"}
+  ];
+
+  var searchInput = document.getElementById("searchInput");
+  var searchResults = document.getElementById("searchResults");
+
+  searchInput.addEventListener("input", function(){
+    var q = searchInput.value.trim().toLowerCase();
+    if (!q) { searchResults.classList.remove("show"); searchResults.innerHTML = ""; return; }
+    var matches = COMMAND_INDEX.filter(function(item){
+      return item.cmd.toLowerCase().indexOf(q) !== -1 || item.desc.toLowerCase().indexOf(q) !== -1;
+    });
+    renderSearchResults(matches);
+  });
+
+  searchInput.addEventListener("focus", function(){
+    if (searchInput.value.trim()) searchResults.classList.add("show");
+  });
+
+  function renderSearchResults(matches){
+    if (!matches.length) {
+      searchResults.innerHTML = '<div class="search-empty">No matching commands</div>';
+      searchResults.classList.add("show");
+      return;
+    }
+    searchResults.innerHTML = matches.slice(0, 8).map(function(m){
+      return '<div class="search-result-item" data-target="'+m.target+'">' +
+        '<span class="search-result-cmd">'+escapeHtml(m.cmd)+'</span>' +
+        '<span class="search-result-desc">'+escapeHtml(m.desc)+'</span></div>';
+    }).join("");
+    searchResults.classList.add("show");
+    searchResults.querySelectorAll(".search-result-item").forEach(function(el){
+      el.addEventListener("click", function(){
+        var target = el.dataset.target;
+        searchInput.value = "";
+        searchResults.classList.remove("show");
+        var t = document.getElementById(target);
+        if (t) {
+          t.scrollIntoView({behavior:"smooth", block:"start"});
+          setTimeout(function(){
+            t.classList.add("flash");
+            setTimeout(function(){ t.classList.remove("flash"); }, 1200);
+          }, 420);
+        }
+      });
+    });
+  }
+
+  document.addEventListener("click", function(e){
+    if (!e.target.closest(".search-wrap")) { searchResults.classList.remove("show"); }
+  });
+
+  document.addEventListener("keydown", function(e){
+    var typing = document.activeElement && document.activeElement.tagName === "INPUT";
+    if (e.key === "Escape") {
+      closeChecklistPanel();
+      searchResults.classList.remove("show");
+      if (typing) document.activeElement.blur();
+    }
+  });
+
+  /* ============================================================
+     SCROLL PROGRESS + ACTIVE SECTION NAV
+     ============================================================ */
+  var scrollFill = document.getElementById("scrollProgressFill");
+  function updateScrollProgress(){
+    var el = document.documentElement;
+    var scrollTop = el.scrollTop || document.body.scrollTop;
+    var scrollable = (el.scrollHeight || document.body.scrollHeight) - el.clientHeight;
+    var pct = scrollable > 0 ? (scrollTop / scrollable) * 100 : 0;
+    scrollFill.style.width = pct + "%";
+  }
+  window.addEventListener("scroll", function(){ requestAnimationFrame(updateScrollProgress); }, {passive:true});
+  updateScrollProgress();
+
+  var navLinks = document.querySelectorAll(".section-nav a");
+  var sections = ["basics","collaborate","remotes","opensource","cheatsheet"]
+    .map(function(id){ return document.getElementById(id); })
+    .filter(Boolean);
+
+  if ("IntersectionObserver" in window) {
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          navLinks.forEach(function(a){
+            a.classList.toggle("active", a.getAttribute("href") === "#" + entry.target.id);
+          });
+        }
+      });
+    }, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
+    sections.forEach(function(s){ observer.observe(s); });
+  }
+
+  /* ============================================================
+     CHECKLIST
+     ============================================================ */
+  var CHECKLIST_ITEMS = [
+    "Configure Git username & email",
+    "Initialize or clone a repository",
+    "Make your first commit",
+    "Push commits to GitHub",
+    "Create a feature branch",
+    "Open your first Pull Request",
+    "Resolve a merge conflict",
+    "Fork an open source repo",
+    "Add an upstream remote",
+    "Sync your fork with upstream",
+    "Submit an open source PR",
+    "Get a PR merged"
+  ];
+
+  var checklistState = {};
+  var checklistItemsEl = document.getElementById("checklistItems");
+  var checklistFill = document.getElementById("checklistFill");
+  var checklistCountEl = document.getElementById("checklistCount");
+  var checklistCompleteEl = document.getElementById("checklistComplete");
+
+  CHECKLIST_ITEMS.forEach(function(label, i){
+    var id = "chk-" + i;
+    checklistState[id] = false;
+    var row = document.createElement("label");
+    row.className = "checklist-item";
+    row.setAttribute("for", id);
+    row.innerHTML = '<input type="checkbox" id="'+id+'"><span>'+escapeHtml(label)+'</span>';
+    checklistItemsEl.appendChild(row);
+    row.querySelector("input").addEventListener("change", function(e){
+      checklistState[id] = e.target.checked;
+      row.classList.toggle("checked", e.target.checked);
+      updateChecklistProgress();
+    });
+  });
+
+  function updateChecklistProgress(){
+    var total = CHECKLIST_ITEMS.length;
+    var done = Object.keys(checklistState).filter(function(k){ return checklistState[k]; }).length;
+    checklistFill.style.width = (done / total * 100) + "%";
+    checklistCountEl.textContent = done + "/" + total;
+    checklistCompleteEl.style.display = (done === total) ? "block" : "none";
+  }
+  updateChecklistProgress();
+
+  var checklistPanel = document.getElementById("checklistPanel");
+  var overlay = document.getElementById("overlay");
+
+  function openChecklistPanel(){ checklistPanel.classList.add("open"); overlay.classList.add("show"); }
+  function closeChecklistPanel(){ checklistPanel.classList.remove("open"); overlay.classList.remove("show"); }
+
+  document.getElementById("checklistToggle").addEventListener("click", openChecklistPanel);
+  document.getElementById("closeChecklist").addEventListener("click", closeChecklistPanel);
+  overlay.addEventListener("click", closeChecklistPanel);
+
+})();
+</script>
+
+
+</body></html>

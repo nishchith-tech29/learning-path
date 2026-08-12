@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Study Notes: Deep Learning Foundations - Day 1</title>
+    
+    <!-- MathJax Configuration to fix rendering of $ and $$ -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --primary-blue: #0056b3;
+            --highlight-orange: #d35400;
+            --badge-green: #27ae60;
+            --text-main: #333333;
+            --text-muted: #6c757d;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --border-radius: 10px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-blue), #003d82);
+            color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        header h3 {
+            margin: 0 0 20px 0;
+            font-weight: 400;
+            color: #e0e0e0;
+        }
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .header-meta span {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        .toc h2 {
+            margin-top: 0;
+            color: var(--primary-blue);
+        }
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        .toc li {
+            margin-bottom: 10px;
+        }
+        .toc a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .toc a:hover {
+            color: var(--highlight-orange);
+        }
+
+        /* Section Styles */
+        section {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        section h2 {
+            color: var(--primary-blue);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        section h3 {
+            color: var(--text-main);
+            margin-top: 30px;
+        }
+        
+        .badge-time {
+            background: #e2e3e5;
+            color: #383d41;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.6em;
+            font-weight: bold;
+            margin-right: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Boxes */
+        .box {
+            border-left: 5px solid;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .box-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 1.1em;
+        }
+        .box-info { border-color: var(--primary-blue); background: #eef5fb; }
+        .box-info .box-title { color: var(--primary-blue); }
+        .box-def { border-color: #9b59b6; background: #f8f4fb; }
+        .box-def .box-title { color: #9b59b6; }
+        .box-ex { border-color: var(--badge-green); background: #f0f9f4; }
+        .box-ex .box-title { color: var(--badge-green); }
+        .box-warn { border-color: #e74c3c; background: #fdf3f2; }
+        .box-warn .box-title { color: #e74c3c; }
+        .box-interview { border-color: var(--highlight-orange); background: #fff8f3; }
+        .box-interview .box-title { color: var(--highlight-orange); }
+        .box-best { border-color: #3498db; background: #f0f7fc; }
+        .box-best .box-title { color: #3498db; }
+        .box-note { border-color: #f1c40f; background: #fdfbf0; }
+        .box-note .box-title { color: #d4ac0d; }
+        .box-summary { border-color: #34495e; background: #f4f6f7; }
+        .box-summary .box-title { color: #34495e; }
+        .box-memory { border-color: #1abc9c; background: #effbf9; }
+        .box-memory .box-title { color: #16a085; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+            vertical-align: middle;
+        }
+        th {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Diagrams */
+        .diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 30px 0;
+            padding: 30px;
+            background: #fdfdfd;
+            border: 1px dashed #ccc;
+            border-radius: var(--border-radius);
+        }
+        .node {
+            padding: 15px 25px;
+            background: var(--primary-blue);
+            color: white;
+            border-radius: 30px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .node:hover {
+            transform: scale(1.05);
+            background: var(--highlight-orange);
+        }
+        .arrow {
+            font-size: 28px;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+        .sub-node {
+            background: #fff;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        code .keyword { color: #569cd6; }
+        code .string { color: #ce9178; }
+        code .comment { color: #6a9955; font-style: italic; }
+        code .function { color: #dcdcaa; }
+
+        /* Formula Container to ensure MathJax center alignment */
+        .math-container {
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <header>
+        <h1>Deep Learning Foundations</h1>
+        <h3>Day 1: Introduction to Neural Networks & AI Fundamentals</h3>
+        <div class="header-meta">
+            <span>Instructor: Krish Naik</span>
+            <span>Duration: ~1 Hr 30 Mins</span>
+            <span>Level: Beginner to Advanced</span>
+        </div>
+    </header>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#section-1">1. AI vs Machine Learning vs Deep Learning</a></li>
+            <li><a href="#section-2">2. Biological Neuron vs Artificial Neuron</a></li>
+            <li><a href="#section-3">3. The Perceptron Model</a></li>
+            <li><a href="#section-4">4. Architecture of an Artificial Neural Network (ANN)</a></li>
+            <li><a href="#section-5">5. Comprehensive Cheat Sheet</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: AI vs ML vs DL -->
+    <section id="section-1">
+        <h2><span class="badge-time">[00:08:15]</span> 1. AI vs Machine Learning vs Deep Learning</h2>
+        
+        <h3>Introduction & Definition</h3>
+        <p>Before writing a single line of code, we must understand the landscape. The terms Artificial Intelligence (AI), Machine Learning (ML), and Deep Learning (DL) are often used interchangeably, but they represent a strict hierarchy.</p>
+        
+        <div class="box box-def">
+            <span class="box-title">Definition Hierarchy</span>
+            <ul>
+                <li><strong>Artificial Intelligence (AI):</strong> The overarching discipline aiming to create systems capable of performing tasks that typically require human intelligence (reasoning, vision, learning).</li>
+                <li><strong>Machine Learning (ML):</strong> A subset of AI containing statistical algorithms that allow computers to learn patterns from data without being explicitly programmed.</li>
+                <li><strong>Deep Learning (DL):</strong> A specialized subset of ML that uses multi-layered Artificial Neural Networks to model highly complex, non-linear relationships, largely inspired by the human brain.</li>
+            </ul>
+        </div>
+
+        <div class="diagram">
+            <div class="node" style="width: 300px; height: 300px; border-radius: 50%; display: flex; align-items: flex-start; justify-content: center; padding-top: 20px; background: #e0f7fa; color: #006064; border: 2px solid #00838f;">
+                <strong>Artificial Intelligence (AI)</strong>
+                <div class="node" style="position: absolute; width: 220px; height: 220px; border-radius: 50%; display: flex; align-items: flex-start; justify-content: center; padding-top: 20px; background: #b2ebf2; color: #00838f; margin-top: 40px; border: 2px solid #00acc1;">
+                    <strong>Machine Learning (ML)</strong>
+                    <div class="node" style="position: absolute; width: 140px; height: 140px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #80deea; color: #004d40; margin-top: 40px; border: 2px solid #00897b;">
+                        <strong>Deep Learning (DL)</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Why it Exists & Problem it Solves</h3>
+        <p>Classical ML algorithms (like Random Forest or SVM) reach a plateau in performance as data volume increases. They also require manual <em>feature engineering</em>. Deep Learning exists to automatically extract hierarchical features from massive, unstructured datasets (images, text, audio) and continuously scale performance with more data.</p>
+    </section>
+
+    <!-- Section 2: Biological Neuron vs Artificial Neuron -->
+    <section id="section-2">
+        <h2><span class="badge-time">[00:25:40]</span> 2. Biological Neuron vs Artificial Neuron</h2>
+        
+        <h3>Introduction & How it Works</h3>
+        <p>Deep Learning was inspired by the most powerful computational engine known: the human brain. The brain consists of billions of interconnected <em>Biological Neurons</em>.</p>
+        
+        <div class="diagram">
+            <div class="node sub-node">Dendrites (Receive)</div>
+            <div class="arrow">→</div>
+            <div class="node sub-node">Soma (Process)</div>
+            <div class="arrow">→</div>
+            <div class="node sub-node">Axon (Transmit)</div>
+            <div class="arrow">→</div>
+            <div class="node sub-node">Synapse (Output)</div>
+        </div>
+
+        <p>We map these biological concepts directly to mathematical equivalents to create an <strong>Artificial Neuron</strong>.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Biological Concept</th>
+                    <th>Artificial Equivalent</th>
+                    <th>Mathematical Representation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Dendrites</td>
+                    <td>Inputs</td>
+                    <td>$X = [x_1, x_2, ..., x_n]$</td>
+                </tr>
+                <tr>
+                    <td>Synaptic Strength</td>
+                    <td>Weights</td>
+                    <td>$W = [w_1, w_2, ..., w_n]$</td>
+                </tr>
+                <tr>
+                    <td>Cell Body (Soma)</td>
+                    <td>Summation Node</td>
+                    <td>$Z = \sum_{i=1}^{n} w_i x_i + b$</td>
+                </tr>
+                <tr>
+                    <td>Axon Hillock</td>
+                    <td>Activation Function</td>
+                    <td>$\hat{y} = f(Z)$</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Section 3: The Perceptron Model -->
+    <section id="section-3">
+        <h2><span class="badge-time">[00:41:10]</span> 3. The Perceptron Model</h2>
+        
+        <h3>Definition</h3>
+        <p>Introduced by Frank Rosenblatt in 1957, the <strong>Perceptron</strong> is the simplest form of an Artificial Neural Network. It is a single-layer neural network used for binary classification.</p>
+        
+        <h3>Step-by-Step Explanation</h3>
+        <ol>
+            <li><strong>Initialization:</strong> Receive an input vector $X \in \mathbb{R}^{d \times 1}$ and assign random weights $W$ and a bias $b$.</li>
+            <li><strong>Weighted Sum (Linear Transformation):</strong> Multiply each input by its corresponding weight and sum them up, adding the bias.
+                <div class="math-container">
+                    $$ z = \sum_{i=1}^{d} w_i \cdot x_i + b = W^T X + b $$
+                </div>
+            </li>
+            <li><strong>Activation (Non-Linearity):</strong> Pass the sum $z$ through a step function to restrict the output strictly between 0 and 1.
+                <div class="math-container">
+                    $$ \hat{y} = \begin{cases} 1 & \text{if } z \ge 0 \\ 0 & \text{if } z < 0 \end{cases} $$
+                </div>
+            </li>
+        </ol>
+
+        <div class="box box-warn">
+            <span class="box-title">Common Mistake: The XOR Problem</span>
+            <p>A single Perceptron is a <em>linear classifier</em>. It can only separate data using a straight line. It completely <strong>fails</strong> on non-linear datasets like the XOR logical operator.</p>
+        </div>
+    </section>
+
+    <!-- Section 4: Architecture of an ANN -->
+    <section id="section-4">
+        <h2><span class="badge-time">[01:10:05]</span> 4. Architecture of an Artificial Neural Network (ANN)</h2>
+        
+        <h3>How Information Flows (Forward Propagation)</h3>
+        <p>In Forward Propagation, data moves strictly left-to-right. At layer $l$, the computation for the activations $A^{[l]}$ is given by:</p>
+        <div class="math-container">
+            $$ Z^{[l]} = W^{[l]} \cdot A^{[l-1]} + b^{[l]} $$
+        </div>
+        <div class="math-container">
+            $$ A^{[l]} = f(Z^{[l]}) $$
+        </div>
+        <p>Where $f$ is an activation function like ReLU, Sigmoid, or Tanh. This process cascades until we compute the final output.</p>
+    </section>
+
+    <!-- Section 5: Comprehensive Cheat Sheet -->
+    <section id="section-5">
+        <h2>5. Comprehensive Cheat Sheet</h2>
+        
+        <div class="box box-summary">
+            <span class="box-title">Important Definitions</span>
+            <ul>
+                <li><strong>Neuron / Node:</strong> The basic computational unit that takes input, applies weights, adds a bias, and passes it through an activation function.</li>
+                <li><strong>Weights ($W$):</strong> Parameters that the network learns during training. They determine the importance of the corresponding input.</li>
+                <li><strong>Bias ($b$):</strong> An additional parameter added to the weighted sum to shift the activation function, ensuring the neuron can activate even when all inputs are zero.</li>
+                <li><strong>Forward Propagation:</strong> The process of passing data through the neural network from the input layer to the output layer to get a prediction.</li>
+                <li><strong>Activation Function:</strong> A mathematical function applied to a neuron's output to introduce non-linearity into the network.</li>
+            </ul>
+        </div>
+
+        <h3>Important Formulas (Fixed MathJax Rendering)</h3>
+        <p><em>Notice how the equations now properly render in standard math format instead of raw text.</em></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Concept</th>
+                    <th>Formula / Equation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Linear Transformation (Weighted Sum)</strong></td>
+                    <td>
+                        <div class="math-container">
+                            $$ z = W^T X + b $$
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Binary Cross-Entropy Loss (Log Loss)</strong></td>
+                    <td>
+                        <div class="math-container">
+                            $$ \mathcal{L} = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i) \right] $$
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Mean Squared Error (Regression Loss)</strong></td>
+                    <td>
+                        <div class="math-container">
+                            $$ \mathcal{L} = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2 $$
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="box box-memory">
+            <span class="box-title">Memory Tricks</span>
+            <ul>
+                <li><strong>AI vs ML vs DL:</strong> Think of Russian Nesting Dolls. The biggest doll is AI, open it up to find ML, open ML to find DL at the core.</li>
+                <li><strong>Weights vs Bias:</strong> Weights control the <em>steepness</em> (slope) of the decision boundary; Bias controls the <em>position</em> (intercept).</li>
+                <li><strong>Linear vs Non-Linear:</strong> A Perceptron without an activation function is just a fancy Linear Regression model. Non-linearity (Activation) gives it the power to solve real-world complexities.</li>
+            </ul>
+        </div>
+
+        <div class="box box-best">
+            <span class="box-title">Important Python Libraries to Know</span>
+            <ul>
+                <li><code>numpy</code>: Used for fundamental matrix and vector multiplications ($W^T X$).</li>
+                <li><code>tensorflow</code> / <code>keras</code>: Used for building deep neural networks in production.</li>
+                <li><code>pytorch</code>: The industry standard library for AI research and deep learning model building.</li>
+                <li><code>scikit-learn</code>: Used for standard Machine Learning and preprocessing data before feeding it to DL models.</li>
+            </ul>
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>

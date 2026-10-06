@@ -1,0 +1,2478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Django Developer Workflow Cheat Sheet</title>
+<meta name="description" content="A complete, premium reference for the Django development workflow — from virtual environments to production deployment.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<style>
+/* ============ DESIGN TOKENS ============ */
+:root{
+  --bg:#ffffff;
+  --bg-soft:#f6f8fc;
+  --bg-soft-2:#eef3fb;
+  --primary:#0b5ed7;
+  --primary-dark:#0847a8;
+  --primary-light:#e8f1fd;
+  --accent:#2f80ed;
+  --text:#0f172a;
+  --text-secondary:#475569;
+  --text-muted:#94a3b8;
+  --border:#e6ebf2;
+  --success:#16a34a; --success-bg:#f0fdf4; --success-border:#bbf0cc;
+  --warning:#d97706; --warning-bg:#fffaeb; --warning-border:#fde3a7;
+  --danger:#dc2626; --danger-bg:#fef2f2; --danger-border:#fecdca;
+  --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#ddd3fb;
+  --teal:#0891b2; --teal-bg:#ecfeff; --teal-border:#a6e9f4;
+  --radius-lg:24px; --radius-md:16px; --radius-sm:10px; --radius-xs:8px;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.06);
+  --shadow-md:0 8px 24px rgba(15,23,42,.07);
+  --shadow-lg:0 24px 56px rgba(15,23,42,.12);
+  --font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono',Consolas,'Courier New',monospace;
+  --sidebar-w:290px;
+  --topbar-h:68px;
+  --content-max:920px;
+}
+/* ============ RESET ============ */
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
+}
+body{margin:0;font-family:var(--font-sans);color:var(--text);background:var(--bg);line-height:1.65;-webkit-font-smoothing:antialiased;}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+ul{margin:0;padding:0;list-style:none;}
+p{margin:0;}
+h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:-.01em;}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:4px;}
+/* ============ PROGRESS BAR ============ */
+.progress-bar{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--primary),var(--accent));z-index:1000;transition:width .12s ease-out;}
+/* ============ TOPBAR ============ */
+.topbar{position:sticky;top:0;z-index:900;height:var(--topbar-h);background:rgba(255,255,255,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.topbar-inner{max-width:1440px;margin:0 auto;height:100%;display:flex;align-items:center;gap:18px;padding:0 28px;}
+.hamburger{display:none;width:40px;height:40px;min-width:40px;border-radius:var(--radius-xs);align-items:center;justify-content:center;transition:background .15s;}
+.hamburger:hover{background:var(--bg-soft);}
+.hamburger-bars{display:block;width:18px;height:12px;position:relative;}
+.hamburger-bars span{position:absolute;left:0;width:18px;height:2px;background:var(--text);border-radius:2px;transition:transform .2s, opacity .2s;}
+.hamburger-bars span:nth-child(1){top:0;}
+.hamburger-bars span:nth-child(2){top:5px;}
+.hamburger-bars span:nth-child(3){top:10px;}
+.sidebar.open ~ .sidebar-overlay{}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:15px;white-space:nowrap;}
+.brand-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;box-shadow:var(--shadow-sm);}
+.brand-text{display:none;}
+@media (min-width:560px){.brand-text{display:inline;}}
+.search-wrap{flex:1;max-width:460px;margin-left:auto;position:relative;}
+.search-input{width:100%;padding:10px 38px 10px 40px;border-radius:999px;border:1.5px solid var(--border);background:var(--bg-soft);font-size:14px;font-family:inherit;color:var(--text);transition:box-shadow .2s,border-color .2s,background .2s;}
+.search-input::placeholder{color:var(--text-muted);}
+.search-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px var(--primary-light);background:#fff;}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;}
+.search-kbd{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text-muted);background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-family:var(--font-mono);}
+.no-results{display:none;text-align:center;padding:48px 24px;color:var(--text-secondary);}
+.no-results.show{display:block;}
+/* ============ LAYOUT ============ */
+.layout{display:flex;max-width:1440px;margin:0 auto;align-items:flex-start;}
+.sidebar{position:sticky;top:var(--topbar-h);width:var(--sidebar-w);min-width:var(--sidebar-w);height:calc(100vh - var(--topbar-h));overflow-y:auto;padding:28px 14px 28px 28px;border-right:1px solid var(--border);}
+.sidebar-nav{display:flex;flex-direction:column;gap:2px;}
+.sidebar-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);padding:8px 12px 10px;}
+.nav-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-xs);font-size:13.5px;color:var(--text-secondary);font-weight:500;transition:background .15s,color .15s;}
+.nav-link:hover{background:var(--bg-soft);color:var(--text);}
+.nav-link.active{background:var(--primary-light);color:var(--primary-dark);font-weight:700;}
+.nav-num{width:20px;height:20px;min-width:20px;border-radius:6px;background:var(--bg-soft-2);color:var(--text-muted);font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);}
+.nav-link.active .nav-num{background:var(--primary);color:#fff;}
+.nav-icon{font-size:14px;}
+.nav-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-divider{margin:16px 0 6px;padding:14px 12px 0;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--purple);border-top:1px solid var(--border);}
+.back-to-top{display:flex;align-items:center;gap:8px;margin-top:18px;padding:10px 12px;border-radius:var(--radius-xs);font-size:13px;font-weight:600;color:var(--primary);border:1px solid var(--border);}
+.back-to-top:hover{background:var(--primary-light);border-color:var(--primary-light);}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:940;}
+.sidebar-overlay.show{display:block;}
+.main-content{flex:1;min-width:0;padding:32px 28px 100px;max-width:calc(var(--content-max) + 56px);margin:0 auto;}
+/* ============ HERO ============ */
+.hero{position:relative;border-radius:var(--radius-lg);padding:52px 40px;background:linear-gradient(135deg,#0847a8 0%,#0b5ed7 48%,#2f80ed 100%);overflow:hidden;box-shadow:var(--shadow-lg);scroll-margin-top:90px;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 70%);}
+.hero::after{content:'';position:absolute;bottom:-100px;left:-40px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 70%);}
+.hero-eyebrow{position:relative;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#cfe2fb;margin-bottom:16px;}
+.hero-title{position:relative;color:#fff;font-size:clamp(28px,4vw,44px);line-height:1.12;font-weight:800;letter-spacing:-.02em;max-width:640px;}
+.hero-subtitle{position:relative;color:#d8e8fc;font-size:17px;margin-top:14px;max-width:560px;font-weight:500;}
+.hero-pills{position:relative;display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(6px);color:#fff;font-size:13px;font-weight:600;}
+.pill-icon{font-size:14px;}
+/* ============ ROADMAP (signature element) ============ */
+.roadmap-card{margin-top:28px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:36px 40px;box-shadow:var(--shadow-md);}
+.card-eyebrow{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--primary);margin-bottom:8px;}
+.card-title{font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.01em;}
+.card-desc{color:var(--text-secondary);font-size:14.5px;margin-top:8px;max-width:560px;}
+.roadmap-list{margin-top:28px;position:relative;}
+.roadmap-item{display:flex;align-items:flex-start;gap:16px;padding:12px 14px;border-radius:var(--radius-sm);cursor:pointer;position:relative;transition:background .15s,transform .15s;}
+.roadmap-item:hover{background:var(--bg-soft);transform:translateX(2px);}
+.roadmap-node{display:flex;flex-direction:column;align-items:center;}
+.roadmap-circle{width:36px;height:36px;min-width:36px;border-radius:50%;background:var(--bg-soft-2);border:2px solid var(--border);color:var(--primary-dark);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);z-index:2;transition:background .2s,border-color .2s,color .2s;}
+.roadmap-item.done .roadmap-circle{background:var(--primary);border-color:var(--primary);color:#fff;}
+.roadmap-line{width:2px;flex:1;min-height:22px;background:var(--border);margin:2px 0;}
+.roadmap-item.done .roadmap-line{background:var(--primary);}
+.roadmap-label{padding-top:5px;display:flex;flex-direction:column;gap:2px;}
+.roadmap-label-title{font-weight:700;font-size:14.5px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.roadmap-label-sub{font-size:12.5px;color:var(--text-muted);}
+.roadmap-divider{margin:4px 0 16px 52px;padding:7px 16px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple);background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:999px;display:inline-block;}
+/* ============ TABLE OF CONTENTS ============ */
+.toc-card{margin-top:20px;background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px 36px;}
+.toc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:22px;}
+@media (max-width:680px){.toc-grid{grid-template-columns:1fr;}}
+.toc-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--radius-xs);background:#fff;border:1px solid var(--border);transition:box-shadow .15s,transform .15s,border-color .15s;position:relative;overflow:hidden;}
+.toc-item:hover{box-shadow:var(--shadow-sm);transform:translateY(-1px);border-color:var(--primary-light);}
+.toc-arrow{color:var(--primary);font-weight:700;transition:transform .15s;}
+.toc-item:hover .toc-arrow{transform:translateX(3px);}
+.toc-num{font-family:var(--font-mono);color:var(--text-muted);font-size:12.5px;min-width:20px;}
+.toc-title{flex:1;font-size:13.5px;font-weight:600;color:var(--text);}
+.toc-time{font-size:11.5px;color:var(--text-muted);white-space:nowrap;}
+.toc-divider{grid-column:1 / -1;margin:10px 0 2px;padding-top:10px;border-top:1px dashed var(--border);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple);}
+/* ============ SECTION CARDS ============ */
+#sectionsContainer{margin-top:36px;display:flex;flex-direction:column;gap:24px;}
+.section-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px 44px;box-shadow:var(--shadow-sm);scroll-margin-top:88px;opacity:0;transform:translateY(18px);transition:opacity .5s ease, transform .5s ease;}
+.section-card.visible{opacity:1;transform:translateY(0);}
+.section-card.hidden{display:none;}
+.section-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.section-num{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--primary);background:var(--primary-light);padding:5px 12px;border-radius:999px;letter-spacing:.03em;}
+.section-headline{display:flex;flex-direction:column;gap:8px;margin-top:14px;width:100%;}
+.section-headline h2{font-size:26px;color:var(--text);}
+.badge-time{align-self:flex-start;font-size:12px;font-weight:600;color:var(--text-muted);background:var(--bg-soft);padding:5px 12px;border-radius:999px;}
+.divider{border:none;border-top:1px solid var(--border);margin:22px 0 26px;}
+.subhead{font-size:14px;font-weight:700;color:var(--text);margin:26px 0 12px;display:flex;align-items:center;gap:8px;}
+.section-purpose{font-size:15.5px;color:var(--text-secondary);}
+.section-explanation{font-size:15px;color:var(--text-secondary);margin-top:4px;}
+.section-summary{margin-top:24px;padding:16px 18px;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:14px;color:var(--text-secondary);}
+/* Checklist */
+.checklist{display:flex;flex-direction:column;gap:8px;}
+.checklist-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-xs);background:var(--bg-soft);transition:background .15s;}
+.checklist-item.done{background:var(--success-bg);}
+.check-box{width:19px;height:19px;min-width:19px;border-radius:6px;border:2px solid var(--border);cursor:pointer;position:relative;transition:background .15s,border-color .15s;}
+.check-box.checked{background:var(--success);border-color:var(--success);}
+.check-box.checked::after{content:'';position:absolute;left:5px;top:1px;width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(40deg);}
+.check-text{font-size:14px;color:var(--text-secondary);}
+.checklist-item.done .check-text{color:var(--success);text-decoration:line-through;text-decoration-color:var(--success-border);}
+/* Commands */
+.cmd-list{display:flex;flex-direction:column;gap:8px;}
+.cmd-row{display:flex;align-items:center;gap:14px;padding:11px 16px;background:#0f172a;border-radius:var(--radius-xs);flex-wrap:wrap;}
+.cmd-code{font-family:var(--font-mono);font-size:13px;color:#7dd3fc;white-space:nowrap;}
+.cmd-code::before{content:'$ ';color:#64748b;}
+.cmd-desc{font-size:12.5px;color:#94a3b8;margin-left:auto;}
+/* Code blocks */
+.code-block{margin-top:14px;border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid #1e293b;}
+.code-header{display:flex;align-items:center;gap:12px;padding:11px 16px;background:#1e293b;}
+.code-file{font-family:var(--font-mono);font-size:12.5px;color:#cbd5e1;}
+.code-lang{font-size:10.5px;font-weight:700;letter-spacing:.04em;color:#7dd3fc;background:rgba(125,211,252,.12);padding:3px 8px;border-radius:5px;}
+.copy-btn{margin-left:auto;font-size:12px;font-weight:600;color:#cbd5e1;background:rgba(255,255,255,.06);padding:5px 12px;border-radius:6px;transition:background .15s,color .15s;position:relative;overflow:hidden;}
+.copy-btn:hover{background:rgba(255,255,255,.14);color:#fff;}
+.copy-btn.copied{color:#4ade80;}
+.code-body{display:flex;background:#0d1117;max-height:420px;overflow:auto;}
+.code-gutter{margin:0;padding:16px 10px;font-family:var(--font-mono);font-size:12.5px;line-height:1.65;color:#3f4a5f;text-align:right;user-select:none;border-right:1px solid #1e293b;background:#0a0f1a;}
+.code-pre{margin:0;padding:16px 18px;font-family:var(--font-mono);font-size:12.5px;line-height:1.65;overflow-x:auto;flex:1;}
+.code-pre code.hljs{background:transparent;padding:0;}
+/* Callouts */
+.callout{margin-top:14px;padding:16px 18px;border-radius:var(--radius-sm);border-left:4px solid;box-shadow:var(--shadow-sm);}
+.callout-head{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;margin-bottom:8px;}
+.callout-list{display:flex;flex-direction:column;gap:6px;}
+.callout-list li{font-size:13.5px;color:var(--text-secondary);padding-left:16px;position:relative;}
+.callout-list li::before{content:'—';position:absolute;left:0;color:var(--text-muted);}
+.callout-mistake{background:var(--danger-bg);border-color:var(--danger);}
+.callout-mistake .callout-head{color:var(--danger);}
+.callout-practice{background:var(--success-bg);border-color:var(--success);}
+.callout-practice .callout-head{color:var(--success);}
+.callout-tip{background:var(--purple-bg);border-color:var(--purple);}
+.callout-tip .callout-head{color:var(--purple);}
+.callout-warning{background:var(--warning-bg);border-color:var(--warning);}
+.callout-warning .callout-head{color:var(--warning);}
+.callout-note{background:var(--teal-bg);border-color:var(--teal);}
+.callout-note .callout-head{color:var(--teal);}
+/* Premium tables / quick reference */
+.quickref-card{margin-top:22px;background:var(--bg-soft);border-radius:var(--radius-md);padding:20px 22px;border:1px solid var(--border);}
+.quickref-title{font-size:13.5px;font-weight:700;color:var(--text);margin:0 0 12px;}
+.table-wrap{overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--border);}
+table.premium-table{width:100%;border-collapse:collapse;background:#fff;font-size:13px;min-width:420px;}
+table.premium-table thead th{position:sticky;top:0;background:var(--bg-soft-2);color:var(--text);text-align:left;padding:10px 14px;font-weight:700;font-size:12px;border-bottom:1px solid var(--border);white-space:nowrap;}
+table.premium-table tbody td{padding:10px 14px;color:var(--text-secondary);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12.5px;}
+table.premium-table tbody td:first-child{color:var(--text);font-weight:600;}
+table.premium-table tbody tr:nth-child(even){background:var(--bg-soft);}
+table.premium-table tbody tr:hover{background:var(--primary-light);}
+table.premium-table tbody tr:last-child td{border-bottom:none;}
+/* Footer */
+.footer{margin-top:56px;text-align:center;padding:36px 20px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border);}
+/* Ripple */
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:ripple-anim .6s ease-out;pointer-events:none;}
+@keyframes ripple-anim{to{transform:scale(3.5);opacity:0;}}
+.toc-item .ripple, .roadmap-item .ripple{background:rgba(11,94,215,.15);}
+/* Responsive */
+@media (max-width:1024px){
+  .hamburger{display:flex;}
+  .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:950;background:#fff;transform:translateX(-100%);transition:transform .25s ease;padding-top:calc(var(--topbar-h) + 20px);box-shadow:var(--shadow-lg);}
+  .sidebar.open{transform:translateX(0);}
+  .search-wrap{max-width:none;}
+  .brand-text{display:none;}
+}
+@media (max-width:680px){
+  .main-content{padding:20px 16px 80px;}
+  .hero{padding:34px 22px;}
+  .roadmap-card,.toc-card{padding:24px 20px;}
+  .section-card{padding:26px 20px;}
+  .section-num{font-size:13px;}
+  .section-headline h2{font-size:21px;}
+  .cmd-row{flex-direction:column;align-items:flex-start;gap:4px;}
+  .cmd-desc{margin-left:0;}
+}
+
+/* ===== Added productivity features ===== */
+.top-actions{display:flex;align-items:center;gap:7px;margin-left:8px;}
+.top-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);padding:8px 10px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.top-btn:hover{background:var(--bg-soft);color:var(--text);border-color:var(--primary-light);}
+.top-btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+.top-btn-primary:hover{background:var(--primary-dark);color:#fff;}
+.progress-dashboard{margin-top:24px;padding:26px 30px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);display:grid;grid-template-columns:1.5fr 1fr;gap:18px 24px;}
+.dashboard-title{font-size:22px;}
+.dashboard-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;align-content:start;}
+.stat{padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg-soft);}
+.stat strong{display:block;font-size:22px;font-weight:800;color:var(--primary-dark);}
+.stat span{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.dashboard-progress{height:9px;background:var(--bg-soft-2);border-radius:999px;overflow:hidden;grid-column:1/-1;}
+.dashboard-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:inherit;transition:width .25s ease;}
+.dashboard-actions{display:flex;gap:8px;flex-wrap:wrap;grid-column:1/-1;}
+.mini-btn{border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);padding:8px 12px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;}
+.mini-btn:hover{background:var(--bg-soft);color:var(--text);}
+.mini-btn.danger{color:var(--danger);}
+.version-note{grid-column:1/-1;padding:11px 13px;border-radius:10px;background:var(--warning-bg);border:1px solid var(--warning-border);font-size:12px;color:var(--text-secondary);line-height:1.55;}
+.section-actions{display:flex;gap:6px;}
+.section-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text-muted);cursor:pointer;font-size:15px;}
+.section-btn:hover,.section-btn.active{background:var(--primary-light);border-color:var(--primary-light);color:var(--primary-dark);}
+.section-card.bookmarked{box-shadow:0 0 0 2px rgba(11,94,215,.12),var(--shadow-lg);}
+.checklist-item.done .check-text{text-decoration:line-through;color:var(--text-muted);}
+.section-status{float:right;font-size:11px;font-weight:700;color:var(--text-muted);padding:3px 7px;background:var(--bg-soft);border:1px solid var(--border);border-radius:999px;}
+.nav-link.completed .nav-num{background:var(--success);color:#fff;}
+.nav-link.bookmarked-nav::after{content:'★';margin-left:auto;color:var(--warning);font-size:11px;}
+.notes-panel{margin-top:20px;padding:18px;background:var(--bg-soft);border:1px solid var(--border);border-radius:14px;}
+.notes-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px;font-size:13px;}
+.notes-head span{font-size:11px;color:var(--text-muted);}
+.notes-area{width:100%;min-height:120px;resize:vertical;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font:13px/1.6 var(--font-sans);outline:none;}
+.notes-area:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,128,237,.1);}
+.notes-actions{display:flex;gap:8px;margin-top:10px;}
+body.dark{--bg:#0b1220;--bg-soft:#111a2b;--bg-soft-2:#18233a;--text:#eef4ff;--text-secondary:#bfcae0;--text-muted:#8290a8;--border:#22304a;--primary-light:#142d52;--success-bg:#0d2618;--warning-bg:#2a2111;--danger-bg:#2a1517;}
+body.dark .topbar{background:rgba(11,18,32,.92);}
+body.dark .code-block{border-color:#253551;}
+body.dark .stat strong{color:#9fc4ff;}
+body.dark .top-btn,body.dark .mini-btn,body.dark .section-btn,body.dark .notes-area{background:#0f1728;color:var(--text-secondary);}
+body.focus-mode .topbar,body.focus-mode .sidebar,body.focus-mode .progress-dashboard,body.focus-mode .roadmap-card,body.focus-mode .toc-card,body.focus-mode .footer{display:none;}
+body.focus-mode .layout{display:block;}
+body.focus-mode .main-content{max-width:980px;padding-top:28px;}
+body.focus-mode .hero{margin-bottom:24px;}
+@media(max-width:1050px){.top-actions span{display:none}.top-btn{padding:8px 9px}.top-actions{gap:5px}.progress-dashboard{grid-template-columns:1fr;}}
+@media(max-width:760px){.topbar-inner{gap:8px}.search-wrap{flex:1;min-width:120px}.top-actions{margin-left:0}.progress-dashboard{padding:20px}.dashboard-stats{grid-template-columns:repeat(4,1fr)}.stat{padding:10px 8px}.stat strong{font-size:17px}.stat span{font-size:9px}}
+@media print{*{animation:none!important;transition:none!important}body{background:#fff!important;color:#111!important}.topbar,.sidebar,.sidebar-overlay,.progress-dashboard,.roadmap-card,.toc-card,.section-actions,.footer,.progress-bar,.search-wrap,.no-results{display:none!important}.layout{display:block!important}.main-content{max-width:none!important;padding:0!important}.hero{margin:0 0 20px!important;box-shadow:none!important;break-inside:avoid}.section-card{box-shadow:none!important;border:1px solid #bbb!important;break-inside:avoid-page;page-break-inside:avoid;margin-bottom:18px}.notes-panel{display:none!important}.code-block{break-inside:avoid;page-break-inside:avoid}.callout{break-inside:avoid;page-break-inside:avoid}}
+
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu">
+      <span class="hamburger-bars"><span></span><span></span><span></span></span>
+    </button>
+    <div class="brand">
+      <span class="brand-mark">🎸</span>
+      <span class="brand-text">Django Workflow Handbook</span>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search commands, sections, code…" aria-label="Search">
+      <span class="search-kbd">/</span>
+    </div>
+    <div class="top-actions">
+      <button class="top-btn" id="themeBtn" type="button" title="Toggle dark mode">🌙 <span>Theme</span></button>
+      <button class="top-btn" id="focusBtn" type="button" title="Toggle focus mode">🎯 <span>Focus</span></button>
+      <button class="top-btn" id="printBtn" type="button" title="Print or save as PDF">🖨️ <span>Print</span></button>
+      <button class="top-btn top-btn-primary" id="progressBtn" type="button" title="Open progress actions">✓ <span>Progress</span></button>
+    </div>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-eyebrow">On this page</div>
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+    <a href="#top" class="back-to-top">↑ Back to top</a>
+  </aside>
+  <main class="main-content">
+    <section class="hero" id="top">
+      <div class="hero-eyebrow">🗺️ Developer Workflow · Django</div>
+      <h1 class="hero-title">Ultimate Django Developer Workflow Cheat Sheet</h1>
+      <p class="hero-subtitle">Build Django applications like a professional — from your first virtual environment to a live, production e-commerce platform.</p>
+      <div class="hero-pills" id="heroPills"></div>
+    </section>
+    <section class="progress-dashboard" id="progressDashboard">
+      <div>
+        <div class="card-eyebrow">Your progress</div>
+        <h2 class="card-title dashboard-title">Keep the handbook state in this browser</h2>
+        <p class="card-desc">Checks, bookmarks, notes, theme, and reading progress are stored locally. Use export to carry your progress to another browser.</p>
+      </div>
+      <div class="dashboard-stats">
+        <div class="stat"><strong id="statPercent">0%</strong><span>complete</span></div>
+        <div class="stat"><strong id="statSections">0/28</strong><span>sections done</span></div>
+        <div class="stat"><strong id="statChecks">0/140</strong><span>checklist items</span></div>
+        <div class="stat"><strong id="statTime">~4 hr</strong><span>total read</span></div>
+      </div>
+      <div class="dashboard-progress"><span id="dashboardProgressFill"></span></div>
+      <div class="dashboard-actions">
+        <button class="mini-btn" id="exportBtn" type="button">Export progress</button>
+        <button class="mini-btn" id="importBtn" type="button">Import progress</button>
+        <button class="mini-btn danger" id="resetBtn" type="button">Reset progress</button>
+        <input type="file" id="importFile" accept="application/json" hidden>
+      </div>
+      <div class="version-note">ℹ️ This handbook's source examples target the versions named in the hero metadata. When your project uses a newer Django release, re-check version-specific APIs before copying configuration verbatim.</div>
+    </section>
+    <section class="roadmap-card">
+      <div class="card-eyebrow">The Journey</div>
+      <h2 class="card-title">Developer Workflow Roadmap</h2>
+      <p class="card-desc">Every stage, in the order you'll actually hit them — first building the core Django workflow, then applying it to a real e-commerce platform. Click any stage to jump straight there.</p>
+      <div class="roadmap-list" id="roadmapList"></div>
+    </section>
+    <section class="toc-card">
+      <div class="card-eyebrow">Reference</div>
+      <h2 class="card-title">Table of Contents</h2>
+      <p class="card-desc">Same stages, laid out for quick scanning — with reading time for each.</p>
+      <div class="toc-grid" id="tocList"></div>
+    </section>
+    <div id="sectionsContainer"></div>
+    <div class="no-results" id="noResults">No sections match your search. Try a different term.</div>
+    <footer class="footer">
+      Ultimate Django Developer Workflow Cheat Sheet · Django 5.2 LTS · Python 3.13 · Built for developers who keep this open on a second monitor.
+    </footer>
+  </main>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+/* ============================================================
+   CONTENT DATA
+   Each section: id, num, title, icon, time, purpose, checklist,
+   commands, explanation, code[], mistakes[], practices[], tips[],
+   quickRef{title,headers,rows}, summary
+   ============================================================ */
+const sections = [
+{
+  id:'env', num:1, title:'Create Environment', icon:'🧪', time:'6 min',
+  purpose:`Isolate every project's dependencies so two Django projects on your machine never fight over package versions.`,
+  checklist:[
+    `Install Python 3.13+ from python.org`,
+    `Create a virtual environment inside your project folder`,
+    `Activate the environment before installing anything`,
+    `Upgrade pip, then install Django`,
+    `Freeze dependencies into requirements.txt`
+  ],
+  commands:[
+    {cmd:`python -m venv venv`, desc:`Create a virtual environment`},
+    {cmd:`source venv/bin/activate`, desc:`Activate it (macOS/Linux)`},
+    {cmd:`venv\\Scripts\\activate`, desc:`Activate it (Windows)`},
+    {cmd:`pip install --upgrade pip`, desc:`Upgrade pip itself`},
+    {cmd:`pip install django`, desc:`Install Django into the venv`}
+  ],
+  explanation:`A virtual environment is a self-contained folder with its own Python interpreter and its own site-packages directory. When it's active, "pip install" only affects that folder — your system Python and your other projects stay untouched. This is the single habit that prevents the most common "it works on my machine" bugs.`,
+  code:[
+    {file:`requirements.txt`, lang:'plaintext', code:`Django==5.2.8
+psycopg2-binary==2.9.9
+python-decouple==3.8
+gunicorn==22.0.0
+whitenoise==6.7.0`}
+  ],
+  mistakes:[
+    `Running pip install before activating the venv — packages land in your global Python instead.`,
+    `Committing the venv/ folder to Git, bloating the repo with thousands of unrelated files.`,
+    `Forgetting which shell you're in and reactivating an old environment for a new project.`
+  ],
+  practices:[
+    `One virtual environment per project, named consistently (venv or .venv).`,
+    `Add venv/ and .venv/ to .gitignore on day one, before your first commit.`,
+    `Pin exact versions in requirements.txt so teammates and servers match your setup.`
+  ],
+  tips:[`Your terminal prompt changing to show "(venv)" is the confirmation the environment is active — check for it before every install.`],
+  quickRef:{title:'Virtual Environment Commands', headers:['Command','What it does'], rows:[
+    [`python -m venv venv`, `create`],
+    [`source venv/bin/activate`, `activate (mac/linux)`],
+    [`venv\\Scripts\\activate`, `activate (windows)`],
+    [`deactivate`, `exit the environment`],
+    [`pip list`, `see installed packages`],
+    [`pip freeze > requirements.txt`, `export dependencies`]
+  ]},
+  summary:`Every Django project starts here — a clean, isolated home for its dependencies. Get this right and the next eighteen stages go a lot smoother.`
+},
+{
+  id:'project', num:2, title:'Create Project', icon:'🏗️', time:'5 min',
+  purpose:`Generate Django's project skeleton — the top-level configuration that every app in your codebase will plug into.`,
+  checklist:[
+    `Confirm your virtual environment is active`,
+    `Run django-admin startproject with a trailing dot`,
+    `Verify the folder structure was created correctly`,
+    `Run the development server and load it in a browser`
+  ],
+  commands:[
+    {cmd:`django-admin startproject config .`, desc:`Create project in current folder`},
+    {cmd:`python manage.py runserver`, desc:`Start the dev server`},
+    {cmd:`python manage.py runserver 0.0.0.0:8000`, desc:`Start it, reachable on your LAN`}
+  ],
+  explanation:`The trailing dot after "config" tells Django to place manage.py in your current directory instead of nesting everything inside an extra folder. "config" is just a name — Django doesn't care what you call the settings package, but naming it something other than your app names avoids import confusion later.`,
+  code:[
+    {file:`project structure`, lang:'plaintext', code:`myproject/
+├── manage.py
+├── venv/
+├── requirements.txt
+└── config/
+    ├── __init__.py
+    ├── settings.py
+    ├── urls.py
+    ├── asgi.py
+    └── wsgi.py`}
+  ],
+  mistakes:[
+    `Forgetting the trailing dot, which nests the project one folder deeper than expected.`,
+    `Running the command outside the activated virtual environment.`,
+    `Naming the project the same as a planned app, causing import clashes.`
+  ],
+  practices:[
+    `Use a neutral name like "config" or "core" for the project package.`,
+    `Commit manage.py and the config/ folder before writing any app code.`
+  ],
+  tips:[`manage.py is just a thin wrapper around django-admin that also sets the DJANGO_SETTINGS_MODULE — you'll use it constantly from here on.`],
+  quickRef:{title:'Key Project Files', headers:['File','Purpose'], rows:[
+    [`manage.py`, `command-line entry point`],
+    [`settings.py`, `all project configuration`],
+    [`urls.py`, `root URL routing table`],
+    [`wsgi.py`, `sync production server entry`],
+    [`asgi.py`, `async production server entry`]
+  ]},
+  summary:`You now have a runnable Django project with nothing in it yet — the blank canvas every app you build will attach to.`
+},
+{
+  id:'app', num:3, title:'Create First App', icon:'🧩', time:'6 min',
+  purpose:`Break your project into focused apps — reusable, self-contained units of functionality like "blog" or "accounts".`,
+  checklist:[
+    `Run startapp inside the project root`,
+    `Register the app in INSTALLED_APPS`,
+    `Understand what each generated file is for`,
+    `Create an app-level urls.py (Django doesn't generate one)`
+  ],
+  commands:[
+    {cmd:`python manage.py startapp blog`, desc:`Scaffold a new app`},
+    {cmd:`python manage.py startapp accounts`, desc:`Scaffold another app`}
+  ],
+  explanation:`A Django "project" is the whole site; an "app" is one feature within it. Apps are meant to be small and pluggable — a blog app shouldn't know anything about your payments app. This separation is what makes large Django codebases stay manageable years in.`,
+  code:[
+    {file:`config/settings.py`, lang:'python', code:`INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # Local apps
+    'blog',
+    'accounts',
+]`}
+  ],
+  mistakes:[
+    `Forgetting to add the new app to INSTALLED_APPS — migrations and templates silently fail to register.`,
+    `Building one giant "core" app instead of splitting by feature domain.`,
+    `Never creating blog/urls.py, then routing everything from the root urls.py.`
+  ],
+  practices:[
+    `Keep apps focused on one domain — models, views, and templates that belong together.`,
+    `Give apps short, lowercase, singular-or-plural names that describe what they do.`
+  ],
+  tips:[`Run "python manage.py startapp" from the same folder as manage.py, or the app's apps.py will register the wrong path.`],
+  quickRef:{title:'What Each App File Does', headers:['File','Purpose'], rows:[
+    [`models.py`, `database table definitions`],
+    [`views.py`, `request/response logic`],
+    [`admin.py`, `admin site registration`],
+    [`apps.py`, `app configuration class`],
+    [`migrations/`, `versioned schema changes`],
+    [`tests.py`, `unit tests for this app`]
+  ]},
+  summary:`Your project now has real structure — a dedicated home for the blog's models, views, and templates, separate from everything else.`
+},
+{
+  id:'settings', num:4, title:'Configure Settings', icon:'⚙️', time:'8 min',
+  purpose:`Tell Django where your database lives, which apps are active, and how the project should behave in development versus production.`,
+  checklist:[
+    `Set up environment variables for secrets`,
+    `Configure DATABASES for your target database`,
+    `Review MIDDLEWARE order`,
+    `Set ALLOWED_HOSTS for your environment`,
+    `Never commit SECRET_KEY or DEBUG=True to a shared repo`
+  ],
+  commands:[
+    {cmd:`pip install python-decouple`, desc:`Load secrets from a .env file`},
+    {cmd:`python manage.py check`, desc:`Validate current settings`}
+  ],
+  explanation:`settings.py is a plain Python module, which means anything Python can do, settings.py can do — including reading from environment variables so the same codebase behaves differently on your laptop and on a production server without any code changes.`,
+  code:[
+    {file:`config/settings.py`, lang:'python', code:`from decouple import config
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
+    }
+}`}
+  ],
+  mistakes:[
+    `Leaving DEBUG=True in production — it exposes full stack traces, settings, and installed packages to visitors.`,
+    `Hardcoding SECRET_KEY directly in settings.py and pushing it to a public repo.`,
+    `Setting ALLOWED_HOSTS = ['*'] and forgetting to lock it down before launch.`
+  ],
+  practices:[
+    `Keep one settings.py and drive differences entirely through environment variables.`,
+    `Add .env to .gitignore and commit a .env.example with placeholder values instead.`
+  ],
+  tips:[`"python manage.py check --deploy" specifically audits settings.py for production-readiness issues before you ship.`],
+  quickRef:{title:'Settings You Touch Most', headers:['Setting','Controls'], rows:[
+    [`DEBUG`, `error page verbosity`],
+    [`ALLOWED_HOSTS`, `which domains can serve the site`],
+    [`INSTALLED_APPS`, `active apps + built-ins`],
+    [`MIDDLEWARE`, `request/response pipeline`],
+    [`DATABASES`, `db engine + credentials`],
+    [`TIME_ZONE`, `default project timezone`]
+  ]},
+  summary:`Settings are the control panel for everything that follows — get the dev/production split right now and every later stage stays simple.`
+},
+{
+  id:'page', num:5, title:'Create First Page', icon:'📄', time:'6 min',
+  purpose:`Wire up the request/response cycle end to end — a URL pattern, a view function, and a response the browser can render.`,
+  checklist:[
+    `Write a view function that returns a response`,
+    `Create blog/urls.py and define a path`,
+    `include() the app's urls in the project's root urls.py`,
+    `Name every URL pattern for use with reverse()`
+  ],
+  commands:[
+    {cmd:`python manage.py runserver`, desc:`Reload and check the new page`}
+  ],
+  explanation:`Django resolves a URL by walking urlpatterns top to bottom until one matches, then calls the matching view with the request. Function-based views take a request and return an HttpResponse (or something that behaves like one, such as render()).`,
+  code:[
+    {file:`blog/views.py`, lang:'python', code:`from django.shortcuts import render
+def home(request):
+    context = {'page_title': 'Welcome to the Blog'}
+    return render(request, 'blog/home.html', context)`},
+    {file:`blog/urls.py`, lang:'python', code:`from django.urls import path
+from . import views
+app_name = 'blog'
+urlpatterns = [
+    path('', views.home, name='home'),
+]`},
+    {file:`config/urls.py`, lang:'python', code:`from django.contrib import admin
+from django.urls import path, include
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls')),
+]`}
+  ],
+  mistakes:[
+    `Forgetting to include() the app's urls.py in the project-level urls.py — the page 404s with no obvious cause.`,
+    `Leaving out name= on a path(), then having reverse() or {% url %} fail later.`,
+    `Returning a plain string instead of an HttpResponse or render() call.`
+  ],
+  practices:[
+    `Set app_name in every app's urls.py to namespace URL names and avoid collisions.`,
+    `Keep view functions thin — push real logic into models or separate service functions.`
+  ],
+  tips:[`Use {% url 'blog:home' %} in templates instead of hardcoding "/" — it keeps templates correct even if you change the route later.`],
+  quickRef:{title:'path() vs re_path()', headers:['Function','Use when'], rows:[
+    [`path()`, `simple, readable route converters`],
+    [`re_path()`, `you need a full regex pattern`],
+    [`<int:pk>`, `capture an integer`],
+    [`<slug:slug>`, `capture a URL-friendly slug`],
+    [`<str:name>`, `capture a plain string segment`]
+  ]},
+  summary:`A visitor can now hit a URL and get a real response back — the smallest possible complete Django request cycle, working end to end.`
+},
+{
+  id:'templates', num:6, title:'Design Templates', icon:'🎨', time:'8 min',
+  purpose:`Turn context data into HTML using Django's template language, without repeating your page chrome on every single page.`,
+  checklist:[
+    `Point TEMPLATES DIRS at a project-level templates folder`,
+    `Build a base.html with the shared layout`,
+    `Extend it from every page-specific template`,
+    `Load {% static %} wherever you reference CSS or images`
+  ],
+  commands:[
+    {cmd:`mkdir -p templates/blog`, desc:`Create the template folders`}
+  ],
+  explanation:`{% extends %} and {% block %} let a child template inherit a parent's layout and only override specific regions. {% include %} pulls in a reusable fragment, like a navbar, without inheritance at all. Filters transform a value for display; tags control logic and flow.`,
+  code:[
+    {file:`templates/base.html`, lang:'plaintext', code:`{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}My Site{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+  {% include 'partials/navbar.html' %}
+  <main>{% block content %}{% endblock %}</main>
+</body>
+</html>`},
+    {file:`templates/blog/home.html`, lang:'plaintext', code:`{% extends 'base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+  <h1>{{ page_title|title }}</h1>
+  {% for post in posts %}
+    <p>{{ post.title }} — {{ post.created_at|date:"M d, Y" }}</p>
+  {% empty %}
+    <p>No posts yet.</p>
+  {% endfor %}
+{% endblock %}`}
+  ],
+  mistakes:[
+    `Forgetting {% load static %} at the top, so every {% static %} tag silently fails.`,
+    `Hardcoding the navbar in every template instead of using {% include %}.`,
+    `Mismatched {% block %} names between parent and child templates.`
+  ],
+  practices:[
+    `One base.html per site section (public site vs admin-style dashboard) if the layouts genuinely differ.`,
+    `Keep logic out of templates — a template should format data, not compute it.`
+  ],
+  tips:[`APP_DIRS: True in TEMPLATES lets Django also find templates inside each app's own templates/ folder — handy for reusable, pluggable apps.`],
+  quickRef:{title:'Common Template Tags & Filters', headers:['Tag / Filter','Use'], rows:[
+    [`{% extends %}`, `inherit a parent layout`],
+    [`{% block %}`, `define an overridable region`],
+    [`{% include %}`, `insert a reusable fragment`],
+    [`{% for %} / {% empty %}`, `loop with a fallback`],
+    [`|date:"M d, Y"`, `format a date`],
+    [`|default:"—"`, `fallback for empty values`]
+  ]},
+  summary:`Your pages now share one consistent layout instead of nineteen copy-pasted <head> tags — the DRY principle applied to HTML.`
+},
+{
+  id:'database', num:7, title:'Build Database', icon:'🗄️', time:'8 min',
+  purpose:`Define your data as Python classes and let Django generate and apply the matching SQL for you.`,
+  checklist:[
+    `Design your models with the right field types`,
+    `Add a __str__ method to every model`,
+    `Run makemigrations after any model change`,
+    `Run migrate to apply pending migrations`
+  ],
+  commands:[
+    {cmd:`python manage.py makemigrations`, desc:`Generate migration files`},
+    {cmd:`python manage.py migrate`, desc:`Apply migrations to the database`},
+    {cmd:`python manage.py sqlmigrate blog 0001`, desc:`Preview the SQL a migration runs`}
+  ],
+  explanation:`A model is a Python class; each attribute maps to a database column. makemigrations reads your models and writes a migration file describing the change; migrate actually runs that change against the database. This two-step process means every schema change is versioned and reviewable, just like application code.`,
+  code:[
+    {file:`blog/models.py`, lang:'python', code:`from django.db import models
+from django.conf import settings
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+    body = models.TextField()
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='posts',
+    )
+    published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        ordering = ['-created_at']
+    def __str__(self):
+        return self.title`}
+  ],
+  mistakes:[
+    `Changing a model and forgetting to run makemigrations — the database silently falls out of sync with your code.`,
+    `Hand-editing an already-applied migration file instead of creating a new one.`,
+    `Using on_delete=models.CASCADE everywhere without considering what should actually happen.`
+  ],
+  practices:[
+    `Keep migrations small and reviewable — one logical change per migration where practical.`,
+    `Always define __str__ so the admin, shell, and debug output are readable.`
+  ],
+  tips:[`"python manage.py makemigrations --dry-run" shows what would be generated without writing any files — useful for sanity-checking model changes.`],
+  quickRef:{title:'Common Field Types', headers:['Field','Stores'], rows:[
+    [`CharField`, `short text, needs max_length`],
+    [`TextField`, `long, unbounded text`],
+    [`IntegerField`, `whole numbers`],
+    [`BooleanField`, `true / false`],
+    [`DateTimeField`, `date + time`],
+    [`ForeignKey`, `many-to-one relationship`],
+    [`ManyToManyField`, `many-to-many relationship`]
+  ]},
+  summary:`Your data model now exists both as readable Python and as real database tables — kept in lockstep through migrations.`
+},
+{
+  id:'query', num:8, title:'Query Database', icon:'🔍', time:'9 min',
+  purpose:`Pull data back out using Django's ORM — Python method chains that compile down to SQL, so you rarely need to write raw queries.`,
+  checklist:[
+    `Know the difference between filter() and get()`,
+    `Chain lookups for precise conditions`,
+    `Use select_related / prefetch_related to avoid N+1 queries`,
+    `Reach for aggregate() and annotate() before writing raw SQL`
+  ],
+  commands:[
+    {cmd:`python manage.py shell`, desc:`Open an interactive ORM shell`},
+    {cmd:`python manage.py dbshell`, desc:`Open a raw database shell`}
+  ],
+  explanation:`Every QuerySet is lazy — it doesn't hit the database until you actually iterate it, slice it, or call something like list() on it. That laziness is what lets you chain .filter().exclude().order_by() and have Django combine it all into a single efficient query.`,
+  code:[
+    {file:`blog/views.py`, lang:'python', code:`from django.shortcuts import render
+from .models import Post
+def post_list(request):
+    posts = (
+        Post.objects
+        .filter(published=True)
+        .select_related('author')
+        .order_by('-created_at')
+    )
+    return render(request, 'blog/list.html', {'posts': posts})`}
+  ],
+  mistakes:[
+    `Looping over a queryset and accessing post.author inside the loop without select_related — one query per row.`,
+    `Using .get() when more than one row could match, triggering MultipleObjectsReturned.`,
+    `Calling len(queryset) repeatedly instead of caching the evaluated list once.`
+  ],
+  practices:[
+    `Reach for select_related on ForeignKey/OneToOne and prefetch_related on reverse FK/ManyToMany.`,
+    `Filter in the database with .filter(), not in Python with a list comprehension.`
+  ],
+  tips:[`Django Debug Toolbar's SQL panel will show you exactly how many queries a page ran — the fastest way to catch an N+1 before your users do.`],
+  quickRef:{title:'ORM Lookup Cheat Sheet', headers:['Lookup','Meaning'], rows:[
+    [`__gt / __gte`, `greater than / or equal`],
+    [`__lt / __lte`, `less than / or equal`],
+    [`__contains`, `case-sensitive substring`],
+    [`__icontains`, `case-insensitive substring`],
+    [`__in`, `value is in a list`],
+    [`__startswith`, `begins with value`],
+    [`__isnull`, `is / is not NULL`],
+    [`__range`, `between two values`]
+  ]},
+  summary:`You can now shape exactly the data a page needs, in one efficient query — the ORM skill you'll lean on more than any other.`
+},
+{
+  id:'admin', num:9, title:'Admin', icon:'🛠️', time:'6 min',
+  purpose:`Get a working content-management interface for free, then customize it so it's actually pleasant for a real editor to use.`,
+  checklist:[
+    `Create a superuser account`,
+    `Register each model in admin.py`,
+    `Customize list_display, search_fields, and list_filter`,
+    `Restrict admin access appropriately before going live`
+  ],
+  commands:[
+    {cmd:`python manage.py createsuperuser`, desc:`Create an admin login`},
+    {cmd:`python manage.py runserver`, desc:`Visit /admin/ in your browser`}
+  ],
+  explanation:`Django introspects your models and builds a full CRUD interface automatically. A plain admin.site.register(Post) gets you a working screen; a ModelAdmin subclass is where you shape that screen into something a non-technical editor could use unsupervised.`,
+  code:[
+    {file:`blog/admin.py`, lang:'python', code:`from django.contrib import admin
+from .models import Post
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'published', 'created_at')
+    list_filter = ('published', 'created_at')
+    search_fields = ('title', 'body')
+    prepopulated_fields = {'slug': ('title',)}
+    date_hierarchy = 'created_at'`}
+  ],
+  mistakes:[
+    `Forgetting admin.site.register() (or @admin.register), so a model exists but never appears in the admin.`,
+    `Leaving the default /admin/ URL in a production app scanners actively probe for.`,
+    `Exposing raw foreign key IDs to editors instead of readable dropdowns or autocomplete_fields.`
+  ],
+  practices:[
+    `Use prepopulated_fields to auto-generate slugs from titles as an editor types.`,
+    `Add list_filter and search_fields as soon as a table has more than a handful of rows.`
+  ],
+  tips:[`autocomplete_fields turns a slow foreign-key dropdown into a fast, searchable widget once you have thousands of related rows.`],
+  quickRef:{title:'Useful ModelAdmin Options', headers:['Option','Effect'], rows:[
+    [`list_display`, `columns shown in the list view`],
+    [`list_filter`, `sidebar filters`],
+    [`search_fields`, `enables the search box`],
+    [`readonly_fields`, `locks fields from editing`],
+    [`autocomplete_fields`, `searchable FK widget`]
+  ]},
+  summary:`Content editors can now manage real data without ever touching code — and it took a handful of lines, not a hand-built dashboard.`
+},
+{
+  id:'forms', num:10, title:'Forms', icon:'📝', time:'8 min',
+  purpose:`Handle user input safely — rendering fields, validating what comes back, and turning valid input into saved data.`,
+  checklist:[
+    `Choose Form vs ModelForm based on whether it maps to a model`,
+    `Always render {% csrf_token %} inside <form>`,
+    `Check is_valid() before touching cleaned_data`,
+    `Show validation errors back to the user clearly`
+  ],
+  commands:[
+    {cmd:`python manage.py shell`, desc:`Test a form's validation interactively`}
+  ],
+  explanation:`A ModelForm generates its fields directly from a model, including matching validators, and its .save() writes straight to the database. A plain Form is for input that doesn't map one-to-one onto a model, like a contact form or a search box.`,
+  code:[
+    {file:`blog/forms.py`, lang:'python', code:`from django import forms
+from .models import Post
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'slug', 'body', 'published']`},
+    {file:`blog/views.py`, lang:'python', code:`from django.shortcuts import render, redirect
+from .forms import PostForm
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('blog:home')
+    else:
+        form = PostForm()
+    return render(request, 'blog/post_form.html', {'form': form})`}
+  ],
+  mistakes:[
+    `Omitting {% csrf_token %}, which makes every POST request fail with a 403 Forbidden.`,
+    `Reading request.POST directly instead of validating through the form first.`,
+    `Calling form.save() when you actually needed commit=False to set extra fields first.`
+  ],
+  practices:[
+    `Use ModelForm whenever a form maps directly to a model — it keeps validation in one place.`,
+    `Render {{ form.errors }} or per-field errors so users know exactly what to fix.`
+  ],
+  tips:[`form.cleaned_data is only populated after is_valid() returns True — reading it before that check raises an error.`],
+  quickRef:{title:'Common Form Field Types', headers:['Field','Renders as'], rows:[
+    [`CharField`, `text input`],
+    [`EmailField`, `text input + email validation`],
+    [`BooleanField`, `checkbox`],
+    [`ChoiceField`, `select dropdown`],
+    [`ModelChoiceField`, `dropdown of model instances`]
+  ]},
+  summary:`User input now flows through validation before it ever touches your database — the boundary that keeps bad data out.`
+},
+{
+  id:'auth', num:11, title:'Authentication', icon:'🔐', time:'9 min',
+  purpose:`Let users sign up, log in, and log out safely, using Django's battle-tested auth system instead of rolling your own.`,
+  checklist:[
+    `Use django.contrib.auth's built-in views for login/logout`,
+    `Protect views with @login_required or LoginRequiredMixin`,
+    `Never store or compare raw passwords yourself`,
+    `Point LOGIN_URL at your actual login route`
+  ],
+  commands:[
+    {cmd:`python manage.py createsuperuser`, desc:`Create a test account`},
+    {cmd:`python manage.py changepassword username`, desc:`Reset a user's password`}
+  ],
+  explanation:`django.contrib.auth ships a full User model, hashing, session-based login, and permission checks out of the box. set_password() hashes automatically; you should never assign request.POST['password'] straight onto user.password.`,
+  code:[
+    {file:`config/urls.py`, lang:'python', code:`from django.contrib.auth import views as auth_views
+urlpatterns += [
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+]`},
+    {file:`blog/views.py`, lang:'python', code:`from django.contrib.auth.decorators import login_required
+@login_required
+def post_create(request):
+    # only reachable when request.user is authenticated
+    ...`}
+  ],
+  mistakes:[
+    `Setting user.password = raw_password directly instead of calling user.set_password().`,
+    `Forgetting LOGIN_URL, so @login_required redirects to a route that doesn't exist.`,
+    `Checking request.user.is_authenticated after already rendering a page that needed protecting.`
+  ],
+  practices:[
+    `Use get_user_model() instead of importing User directly, in case you ever swap the user model.`,
+    `Wrap sensitive class-based views with LoginRequiredMixin as the first item in the MRO.`
+  ],
+  tips:[`AUTH_PASSWORD_VALIDATORS in settings.py lets you enforce password strength rules without writing custom validation.`],
+  quickRef:{title:'Authentication Decorators', headers:['Decorator / Mixin','Use'], rows:[
+    [`@login_required`, `function-based view, must be logged in`],
+    [`LoginRequiredMixin`, `class-based view, must be logged in`],
+    [`@permission_required`, `must hold a specific permission`],
+    [`user_passes_test`, `custom eligibility check`]
+  ]},
+  summary:`Users can now prove who they are, and your views can trust request.user — the foundation every permission check builds on.`
+},
+{
+  id:'messages', num:12, title:'Messages', icon:'💬', time:'4 min',
+  purpose:`Give users one-off feedback — "Post published", "Invalid coupon" — that survives a redirect and shows exactly once.`,
+  checklist:[
+    `Confirm django.contrib.messages is in INSTALLED_APPS`,
+    `Call the right message level from your view`,
+    `Render messages in your base template`,
+    `Style each level distinctly so users notice errors`
+  ],
+  commands:[
+    {cmd:`python manage.py shell`, desc:`Inspect message storage backends`}
+  ],
+  explanation:`Messages are queued against the session (or cookies) and cleared the next time they're displayed — which is exactly what you want after a redirect, where you can't just render a variable in the response you're about to leave.`,
+  code:[
+    {file:`blog/views.py`, lang:'python', code:`from django.contrib import messages
+def post_create(request):
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Post published successfully.')
+        return redirect('blog:home')`},
+    {file:`templates/base.html`, lang:'plaintext', code:`{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}`}
+  ],
+  mistakes:[
+    `Adding a message but never rendering {% if messages %} anywhere in the template.`,
+    `Forgetting MessageMiddleware, which throws an obscure error the first time messages.success() runs.`,
+    `Using messages for data that needs to persist beyond one page load.`
+  ],
+  practices:[
+    `Match message.tags to your CSS classes so success/error/warning look visually distinct.`,
+    `Keep message text short and specific about what just happened.`
+  ],
+  tips:[`messages.get_messages(request) lets you inspect or test queued messages directly in a unit test.`],
+  quickRef:{title:'Message Levels', headers:['Function','Typical use'], rows:[
+    [`messages.debug()`, `dev-only diagnostics`],
+    [`messages.info()`, `neutral information`],
+    [`messages.success()`, `action completed`],
+    [`messages.warning()`, `needs attention`],
+    [`messages.error()`, `action failed`]
+  ]},
+  summary:`Small, but it's the difference between a form that saves silently and one that actually confirms what just happened.`
+},
+{
+  id:'static', num:13, title:'Static & Media', icon:'🖼️', time:'8 min',
+  purpose:`Serve your CSS, JS, and images correctly in development, and understand why that setup changes completely in production.`,
+  checklist:[
+    `Set STATIC_URL and STATICFILES_DIRS for your own assets`,
+    `Set MEDIA_URL and MEDIA_ROOT for user uploads`,
+    `Serve media locally in dev via urls.py`,
+    `Run collectstatic before every production deploy`
+  ],
+  commands:[
+    {cmd:`python manage.py collectstatic`, desc:`Gather static files into STATIC_ROOT`},
+    {cmd:`python manage.py findstatic css/main.css`, desc:`Debug where a static file resolves from`}
+  ],
+  explanation:`"Static" files ship with your code (CSS, JS, icons); "media" files are uploaded by users at runtime (avatars, attachments). They're configured separately because they have completely different lifecycles — static files are versioned with your app, media files are not.`,
+  code:[
+    {file:`config/settings.py`, lang:'python', code:`STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'`},
+    {file:`config/urls.py`, lang:'python', code:`from django.conf import settings
+from django.conf.urls.static import static
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+    )`}
+  ],
+  mistakes:[
+    `Forgetting collectstatic before deploying — CSS and JS 404 in production even though they worked locally.`,
+    `Serving media through Django itself in production instead of a CDN or object storage.`,
+    `Mixing STATIC_ROOT and STATICFILES_DIRS up — one is a source, the other is a build output.`
+  ],
+  practices:[
+    `Use whitenoise for static files on small deployments, or S3/Cloud Storage for anything with real traffic.`,
+    `Never let user-uploaded files execute as code — validate file types server-side.`
+  ],
+  tips:[`{% static %} in templates always resolves through STATIC_URL, so you never hardcode a static path that later breaks in production.`],
+  quickRef:{title:'Static vs Media Settings', headers:['Setting','Meaning'], rows:[
+    [`STATIC_URL`, `public URL prefix for static files`],
+    [`STATICFILES_DIRS`, `where your source static files live`],
+    [`STATIC_ROOT`, `collectstatic output folder`],
+    [`MEDIA_URL`, `public URL prefix for uploads`],
+    [`MEDIA_ROOT`, `where uploads are stored on disk`]
+  ]},
+  summary:`Assets and uploads now have a clear, production-ready home — one less surprise waiting for your first real deploy.`
+},
+{
+  id:'advanced', num:14, title:'Advanced Features', icon:'⚡', time:'10 min',
+  purpose:`Reach for Django's higher-leverage tools — class-based views, signals, and middleware — once the basics feel automatic.`,
+  checklist:[
+    `Know when a CBV saves real code over a function-based view`,
+    `Understand what a signal is for, and when to avoid one`,
+    `Read the built-in middleware order before adding your own`,
+    `Write a custom management command for repeatable admin tasks`
+  ],
+  commands:[
+    {cmd:`python manage.py startapp core`, desc:`Home for shared, cross-app code`},
+    {cmd:`python manage.py mycustomcommand`, desc:`Run a custom management command`}
+  ],
+  explanation:`Class-based views trade some explicitness for a lot of reusable behavior — ListView, DetailView, and friends handle pagination, querysets, and templates through sensible conventions. Signals let decoupled code react to events like post_save, but they trade explicitness for convenience, which can make bugs harder to trace.`,
+  code:[
+    {file:`blog/views.py`, lang:'python', code:`from django.views.generic import ListView, DetailView
+from .models import Post
+class PostListView(ListView):
+    model = Post
+    template_name = 'blog/list.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+    def get_queryset(self):
+        return Post.objects.filter(published=True)`},
+    {file:`blog/signals.py`, lang:'python', code:`from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import Post
+@receiver(post_save, sender=Post)
+def notify_on_publish(sender, instance, created, **kwargs):
+    if created and instance.published:
+        # e.g. send a notification email
+        pass`}
+  ],
+  mistakes:[
+    `Reaching for a signal when overriding save() or a form's clean() method would be far easier to trace.`,
+    `Forgetting to connect signals.py by importing it in the app's AppConfig.ready().`,
+    `Stacking too much custom logic into get_queryset() instead of a model manager.`
+  ],
+  practices:[
+    `Prefer explicit method overrides over signals unless multiple unrelated apps truly need to react to the same event.`,
+    `Document any signal's side effects directly above the @receiver.`
+  ],
+  tips:[`Custom management commands (in an app's management/commands/ folder) are the cleanest way to script one-off or recurring admin tasks.`],
+  quickRef:{title:'Common Class-Based Views', headers:['View','Purpose'], rows:[
+    [`ListView`, `paginated list of objects`],
+    [`DetailView`, `single object detail page`],
+    [`CreateView`, `model creation form`],
+    [`UpdateView`, `model edit form`],
+    [`DeleteView`, `confirm + delete object`]
+  ]},
+  summary:`These are the tools that turn repetitive view code into a handful of declarative lines — powerful once you know their edges.`
+},
+{
+  id:'api', num:15, title:'REST API', icon:'🌐', time:'10 min',
+  purpose:`Expose your models as a JSON API using Django REST Framework, so a mobile app or a JS frontend can talk to the same data.`,
+  checklist:[
+    `pip install djangorestframework and add it to INSTALLED_APPS`,
+    `Write a serializer for each model you expose`,
+    `Wire a ViewSet up to a router instead of hand-rolling URLs`,
+    `Set explicit permission_classes on every endpoint`
+  ],
+  commands:[
+    {cmd:`pip install djangorestframework`, desc:`Install DRF`},
+    {cmd:`python manage.py runserver`, desc:`Browse the API at /api/`}
+  ],
+  explanation:`A Serializer is the API equivalent of a ModelForm — it converts model instances to JSON and validates incoming JSON back into Python. A ViewSet bundles list/create/retrieve/update/delete into one class, and a router turns that into a full set of RESTful URLs automatically.`,
+  code:[
+    {file:`blog/serializers.py`, lang:'python', code:`from rest_framework import serializers
+from .models import Post
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'slug', 'body', 'published', 'created_at']`},
+    {file:`blog/api.py`, lang:'python', code:`from rest_framework import viewsets, permissions
+from .models import Post
+from .serializers import PostSerializer
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.filter(published=True)
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]`},
+    {file:`config/urls.py`, lang:'python', code:`from rest_framework.routers import DefaultRouter
+from blog.api import PostViewSet
+router = DefaultRouter()
+router.register('posts', PostViewSet)
+urlpatterns += [path('api/', include(router.urls))]`}
+  ],
+  mistakes:[
+    `Leaving permission_classes at DRF's default, which is often more open than you intended.`,
+    `Returning full model instances instead of paginating large querysets.`,
+    `Forgetting 'rest_framework' in INSTALLED_APPS and getting a confusing import error.`
+  ],
+  practices:[
+    `Use ViewSets + a router for standard CRUD; drop to APIView only for genuinely custom endpoints.`,
+    `Version your API from day one (/api/v1/) even if you think you'll never need v2.`
+  ],
+  tips:[`DRF's browsable API (just visiting the endpoint in a browser) is one of the fastest ways to manually test an endpoint during development.`],
+  quickRef:{title:'DRF Permission Classes', headers:['Class','Effect'], rows:[
+    [`AllowAny`, `fully public`],
+    [`IsAuthenticated`, `must be logged in`],
+    [`IsAuthenticatedOrReadOnly`, `public read, auth write`],
+    [`IsAdminUser`, `staff only`]
+  ]},
+  summary:`Your data now speaks JSON as fluently as it speaks HTML — the same models, one more way to reach them.`
+},
+{
+  id:'optimization', num:16, title:'Optimization', icon:'🚀', time:'9 min',
+  purpose:`Find and fix the handful of query patterns that quietly turn a fast page into a slow one as your data grows.`,
+  checklist:[
+    `Install Django Debug Toolbar in development`,
+    `Watch for N+1 queries on every list page`,
+    `Index columns you filter or order by frequently`,
+    `Cache expensive, rarely-changing computations`
+  ],
+  commands:[
+    {cmd:`pip install django-debug-toolbar`, desc:`Install the query profiler`},
+    {cmd:`python manage.py shell`, desc:`Try .explain() on a slow queryset`}
+  ],
+  explanation:`Most Django performance problems are query problems, not Python problems. select_related/prefetch_related eliminate N+1 patterns; only()/defer() trim columns you don't need; database indexes make WHERE and ORDER BY fast at scale. Measure before you optimize — the toolbar's SQL panel tells you exactly where time goes.`,
+  code:[
+    {file:`blog/models.py`, lang:'python', code:`class Post(models.Model):
+    # ...
+    class Meta:
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['published', '-created_at']),
+        ]`},
+    {file:`blog/views.py`, lang:'python', code:`from django.core.cache import cache
+def popular_posts(request):
+    posts = cache.get('popular_posts')
+    if posts is None:
+        posts = list(Post.objects.filter(published=True).order_by('-views')[:5])
+        cache.set('popular_posts', posts, timeout=300)
+    return render(request, 'blog/popular.html', {'posts': posts})`}
+  ],
+  mistakes:[
+    `Adding caching before confirming a query is actually slow — premature caching adds invalidation bugs for no benefit.`,
+    `Indexing every column "just in case", which slows down writes without meaningfully helping reads.`,
+    `Optimizing Python loops when the real cost is sitting in unoptimized SQL.`
+  ],
+  practices:[
+    `Profile first with the Debug Toolbar or django-silk, then optimize the query that actually shows up.`,
+    `Set a sensible cache timeout and a clear invalidation trigger before shipping any cache.`
+  ],
+  tips:[`QuerySet.explain() prints the database's actual query plan — the same tool a DBA would reach for.`],
+  quickRef:{title:'Performance Checklist', headers:['Technique','Fixes'], rows:[
+    [`select_related()`, `N+1 on ForeignKey/OneToOne`],
+    [`prefetch_related()`, `N+1 on reverse FK/M2M`],
+    [`only() / defer()`, `oversized row fetches`],
+    [`db_index=True`, `slow filter/order_by`],
+    [`cache.set/get`, `expensive repeated computation`]
+  ]},
+  summary:`Performance work is mostly about removing unnecessary queries, not writing clever code — measure, then fix the biggest offender first.`
+},
+{
+  id:'debugging', num:17, title:'Debugging', icon:'🐞', time:'8 min',
+  purpose:`Read Django's errors quickly and confidently, instead of guessing your way through a traceback.`,
+  checklist:[
+    `Read tracebacks from the bottom up, not the top down`,
+    `Configure real logging instead of scattering print()`,
+    `Know the difference between DoesNotExist and MultipleObjectsReturned`,
+    `Use breakpoint() to drop into the debugger exactly where you need it`
+  ],
+  commands:[
+    {cmd:`python manage.py shell`, desc:`Reproduce a bug in isolation`},
+    {cmd:`python manage.py check`, desc:`Catch configuration errors early`}
+  ],
+  explanation:`Django's debug error page (when DEBUG=True) shows the exact line that failed and the full local variable state at every frame — read the bottom frame first, since that's where the actual exception was raised. In production, that same information should go to your logs, never to the visitor's browser.`,
+  code:[
+    {file:`config/settings.py`, lang:'python', code:`LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+    },
+    'root': {'handlers': ['console'], 'level': 'INFO'},
+    'loggers': {
+        'django.request': {'handlers': ['console'], 'level': 'ERROR', 'propagate': False},
+    },
+}`}
+  ],
+  mistakes:[
+    `Leaving print() statements in view code instead of using the logging module.`,
+    `Assuming the top of a traceback is the cause — it's usually the bottom-most frame.`,
+    `Catching a bare except: that swallows the real error and replaces it with a vaguer one.`
+  ],
+  practices:[
+    `Log at the right level — INFO for normal flow, WARNING for recoverable issues, ERROR for real failures.`,
+    `Reproduce bugs in the shell first; it's faster to iterate than reloading a browser tab.`
+  ],
+  tips:[`breakpoint() (built into Python 3.7+) drops you into pdb at that exact line — no import needed.`],
+  quickRef:{title:'Common Exceptions', headers:['Exception','Usually means'], rows:[
+    [`DoesNotExist`, `.get() found zero rows`],
+    [`MultipleObjectsReturned`, `.get() found more than one`],
+    [`ImproperlyConfigured`, `a setting is missing or wrong`],
+    [`FieldError`, `typo'd or invalid field/lookup name`],
+    [`IntegrityError`, `a database constraint was violated`]
+  ]},
+  summary:`Debugging is a skill you build one traceback at a time — the bottom frame and your logs will tell you almost everything you need.`
+},
+{
+  id:'deployment', num:18, title:'Deployment', icon:'🚢', time:'10 min',
+  purpose:`Move your project from "runserver on my laptop" to a real, production-grade server that can handle real traffic.`,
+  checklist:[
+    `Set DEBUG=False and a correct ALLOWED_HOSTS`,
+    `Swap SQLite for PostgreSQL`,
+    `Serve the app with gunicorn behind a reverse proxy`,
+    `Run collectstatic and migrate as part of every deploy`
+  ],
+  commands:[
+    {cmd:`pip install gunicorn`, desc:`Install a production WSGI server`},
+    {cmd:`gunicorn config.wsgi:application`, desc:`Run the app with gunicorn`},
+    {cmd:`python manage.py collectstatic --noinput`, desc:`Gather static files for deploy`},
+    {cmd:`python manage.py migrate`, desc:`Apply migrations on the server`}
+  ],
+  explanation:`manage.py runserver is explicitly not built for production — it's single-threaded and unoptimized. gunicorn (or uwsgi) is a proper WSGI server that can run multiple worker processes; nginx typically sits in front of it to serve static files and handle TLS.`,
+  code:[
+    {file:`Procfile`, lang:'plaintext', code:`web: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`},
+    {file:`config/settings.py`, lang:'python', code:`DEBUG = False
+ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'`}
+  ],
+  mistakes:[
+    `Deploying with DEBUG=True still set — it leaks stack traces, settings, and package versions to any visitor.`,
+    `Shipping with SQLite in production, which doesn't handle concurrent writes well under real load.`,
+    `Forgetting to run migrate on the server, so the deployed code expects columns that don't exist yet.`
+  ],
+  practices:[
+    `Automate collectstatic + migrate as part of your deploy pipeline, not a manual step you might forget.`,
+    `Keep all secrets in environment variables on the host, never inside the repository.`
+  ],
+  tips:[`Run "python manage.py check --deploy" right before shipping — it flags exactly the settings most likely to bite you in production.`],
+  quickRef:{title:'Pre-Deploy Checklist', headers:['Check','Why'], rows:[
+    [`DEBUG = False`, `hides stack traces from visitors`],
+    [`ALLOWED_HOSTS set`, `blocks host header attacks`],
+    [`SECRET_KEY from env`, `not hardcoded or committed`],
+    [`collectstatic run`, `CSS/JS actually load`],
+    [`migrate run`, `schema matches the code`]
+  ]},
+  summary:`This is the stage where "it works on my machine" either gets proven wrong or gets confirmed for real users — plan it, don't wing it.`
+},
+{
+  id:'production', num:19, title:'Production Best Practices', icon:'🛡️', time:'9 min',
+  purpose:`Harden a working deployment into one you can trust with real users and real data over the long term.`,
+  checklist:[
+    `Turn on Django's SECURE_* settings for HTTPS`,
+    `Set up error monitoring so you hear about failures first`,
+    `Rotate secrets on a schedule, not just after an incident`,
+    `Back up your database and actually test the restore`
+  ],
+  commands:[
+    {cmd:`python manage.py check --deploy`, desc:`Audit settings for production risks`},
+    {cmd:`pip install sentry-sdk`, desc:`Add error monitoring`}
+  ],
+  explanation:`Security in Django is mostly a checklist of settings, not custom code — the framework already defends against CSRF, XSS, and SQL injection by default. Your job is to correctly configure the pieces that are environment-specific: HTTPS enforcement, cookie flags, and monitoring for the failures that will inevitably happen.`,
+  code:[
+    {file:`config/settings.py`, lang:'python', code:`SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'`},
+    {file:`config/settings.py`, lang:'python', code:`import sentry_sdk
+sentry_sdk.init(
+    dsn=config('SENTRY_DSN', default=''),
+    traces_sample_rate=0.2,
+    send_default_pii=False,
+)`}
+  ],
+  mistakes:[
+    `Ignoring the warnings from "python manage.py check --deploy" instead of resolving each one.`,
+    `Never testing a database restore, only the backup — a backup you can't restore isn't a backup.`,
+    `Leaving the same SECRET_KEY in place indefinitely, even after a contributor with access leaves.`
+  ],
+  practices:[
+    `Treat "check --deploy" as a required, non-optional step in your release process.`,
+    `Set up alerting (Sentry or similar) before launch, not after the first incident.`
+  ],
+  tips:[`SECURE_HSTS_SECONDS should start small (like 3600) while testing, then be raised once you're confident HTTPS is fully working everywhere.`],
+  quickRef:{title:'Key Security Settings', headers:['Setting','Protects against'], rows:[
+    [`SECURE_SSL_REDIRECT`, `plain HTTP traffic`],
+    [`SESSION_COOKIE_SECURE`, `cookies sent over HTTP`],
+    [`CSRF_COOKIE_SECURE`, `CSRF cookie interception`],
+    [`X_FRAME_OPTIONS`, `clickjacking`],
+    [`SECURE_HSTS_SECONDS`, `SSL-stripping attacks`]
+  ]},
+  summary:`Nineteen stages in, and this is the one that never really finishes — production hardening is an ongoing habit, not a checkbox you tick once.`
+},
+/* ===================== PART 2: E-COMMERCE CASE STUDY ===================== */
+{
+  id:'ecommerce-core', num:20, title:'Core E-Commerce & Product Navigation', icon:'🛍️', time:'11 min', part:'E-Commerce Case Study',
+  purpose:`Model categories, products, image galleries, and buyable variants — then build the browsing flow customers actually use: homepage, category filtering, a store page, and paginated product detail views.`,
+  checklist:[
+    `Model Category and Product with a clean foreign-key relationship`,
+    `Add a ProductImage model for multi-image galleries`,
+    `Add a ProductVariant model for color/size combinations`,
+    `Build homepage, category-filter, and store views`,
+    `Paginate every list view and preserve query params across pages`
+  ],
+  commands:[
+    {cmd:`python manage.py startapp shop`, desc:`Scaffold the e-commerce app`},
+    {cmd:`python manage.py makemigrations shop`, desc:`Generate migrations for the new models`},
+    {cmd:`python manage.py migrate`, desc:`Apply them`},
+    {cmd:`python manage.py loaddata demo_products.json`, desc:`(optional) seed demo data`}
+  ],
+  explanation:`Model relationships mirror how customers browse: a Category groups Products, each Product owns many ProductImages for its gallery and many ProductVariants for buyable combinations like "Red / Medium". Django's Paginator slices a queryset into pages without loading everything into memory, and passing request.GET.urlencode() through your pagination links keeps active filters intact as visitors click "Next".`,
+  code:[
+    {file:`shop/models.py`, lang:'python', code:`from django.db import models
+from django.urls import reverse
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    class Meta:
+        verbose_name_plural = 'categories'
+    def __str__(self):
+        return self.name
+class Product(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True)
+    base_price = models.DecimalField(max_digits=8, decimal_places=2)
+    is_popular = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def get_absolute_url(self):
+        return reverse('shop:product_detail', args=[self.slug])
+    def __str__(self):
+        return self.name
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products/')
+    is_primary = models.BooleanField(default=False)
+    order = models.PositiveIntegerField(default=0)
+    class Meta:
+        ordering = ['order']
+class ProductVariant(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
+    color = models.CharField(max_length=40, blank=True)
+    size = models.CharField(max_length=20, blank=True)
+    price_override = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    stock = models.PositiveIntegerField(default=0)
+    class Meta:
+        unique_together = ['product', 'color', 'size']
+    @property
+    def price(self):
+        return self.price_override or self.product.base_price`},
+    {file:`shop/views.py`, lang:'python', code:`from django.core.paginator import Paginator
+from django.shortcuts import render, get_object_or_404
+from .models import Category, Product
+def home(request):
+    categories = Category.objects.all()
+    return render(request, 'shop/home.html', {'categories': categories})
+def category_detail(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    products = category.products.prefetch_related('images')
+    return _paginated(request, products, 'shop/category.html', {'category': category})
+def store(request):
+    products = Product.objects.filter(is_popular=True).prefetch_related('images')
+    return _paginated(request, products, 'shop/store.html')
+def _paginated(request, queryset, template, extra=None):
+    paginator = Paginator(queryset, 12)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    context = {'page_obj': page_obj, 'querystring': request.GET.urlencode()}
+    context.update(extra or {})
+    return render(request, template, context)
+def product_detail(request, slug):
+    product = get_object_or_404(
+        Product.objects.prefetch_related('images', 'variants'), slug=slug
+    )
+    return render(request, 'shop/product_detail.html', {'product': product})`}
+  ],
+  mistakes:[
+    `Looping over products and calling product.images.all() without prefetch_related — one extra query per product on every list page.`,
+    `Skipping the unique_together constraint on ProductVariant, letting duplicate "Red / Medium" rows exist.`,
+    `Hardcoding pagination links without request.GET.urlencode(), which drops active filters the moment someone clicks "Next".`
+  ],
+  practices:[
+    `prefetch_related('images', 'variants') on any queryset that will render a gallery or variant picker.`,
+    `Use get_object_or_404 instead of a bare .get(), so a bad slug 404s cleanly instead of crashing.`
+  ],
+  tips:[`Paginator.get_page() — instead of .page() — automatically clamps to the last valid page instead of raising an error on an out-of-range page number.`],
+  quickRef:{title:'Paginator API', headers:['Method / Attribute','Returns'], rows:[
+    [`paginator.get_page(n)`, `a Page, safely clamped`],
+    [`page_obj.has_next()`, `boolean`],
+    [`page_obj.has_previous()`, `boolean`],
+    [`page_obj.next_page_number()`, `int`],
+    [`paginator.num_pages`, `total page count`]
+  ]},
+  summary:`Category → Product → Variant is the backbone every other e-commerce section attaches to — model it cleanly here and cart, checkout, and reviews follow naturally.`
+},
+{
+  id:'cart-checkout', num:21, title:'Cart & Checkout', icon:'🛒', time:'10 min', part:'E-Commerce Case Study',
+  purpose:`Let both guests and logged-in users build a cart with full add/update/remove control, then merge the two seamlessly the moment a guest logs in.`,
+  checklist:[
+    `Model Cart with a nullable user and a session_key fallback`,
+    `Build add, update-quantity, and remove endpoints for CartItem`,
+    `Merge a session cart into the user's cart on login`,
+    `Build a checkout view that summarizes the cart before payment`
+  ],
+  commands:[
+    {cmd:`python manage.py shell`, desc:`Inspect a session's cart interactively`}
+  ],
+  explanation:`A guest's cart is keyed to request.session.session_key instead of a user — Django creates that key automatically the first time you write to the session. When they log in, a receiver on the user_logged_in signal looks for a cart matching their old session key and merges its items into their user-linked cart, so nothing they added as a guest disappears.`,
+  code:[
+    {file:`shop/models.py`, lang:'python', code:`from django.conf import settings
+from django.db import models
+class Cart(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=40, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    @property
+    def total(self):
+        return sum(item.subtotal for item in self.items.select_related('variant'))
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    variant = models.ForeignKey('shop.ProductVariant', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    class Meta:
+        unique_together = ['cart', 'variant']
+    @property
+    def subtotal(self):
+        return self.variant.price * self.quantity`},
+    {file:`shop/views.py`, lang:'python', code:`from django.shortcuts import get_object_or_404, redirect, render
+from .models import Cart, CartItem, ProductVariant
+def _get_cart(request):
+    if request.user.is_authenticated:
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+    else:
+        if not request.session.session_key:
+            request.session.save()
+        cart, _ = Cart.objects.get_or_create(session_key=request.session.session_key, user=None)
+    return cart
+def add_to_cart(request, variant_id):
+    variant = get_object_or_404(ProductVariant, id=variant_id)
+    cart = _get_cart(request)
+    item, created = CartItem.objects.get_or_create(cart=cart, variant=variant)
+    if not created:
+        item.quantity += 1
+        item.save()
+    return redirect('shop:cart_detail')
+def update_cart_item(request, item_id, quantity):
+    item = get_object_or_404(CartItem, id=item_id, cart=_get_cart(request))
+    item.quantity = max(1, quantity)
+    item.save()
+    return redirect('shop:cart_detail')
+def remove_from_cart(request, item_id):
+    get_object_or_404(CartItem, id=item_id, cart=_get_cart(request)).delete()
+    return redirect('shop:cart_detail')
+def cart_detail(request):
+    return render(request, 'shop/cart.html', {'cart': _get_cart(request)})`},
+    {file:`shop/signals.py`, lang:'python', code:`from django.contrib.auth.signals import user_logged_in
+from django.dispatch import receiver
+from .models import Cart
+@receiver(user_logged_in)
+def merge_cart_on_login(sender, request, user, **kwargs):
+    guest_cart = Cart.objects.filter(session_key=request.session.session_key, user=None).first()
+    if not guest_cart:
+        return
+    user_cart, _ = Cart.objects.get_or_create(user=user)
+    for item in guest_cart.items.all():
+        existing = user_cart.items.filter(variant=item.variant).first()
+        if existing:
+            existing.quantity += item.quantity
+            existing.save()
+        else:
+            item.cart = user_cart
+            item.save()
+    guest_cart.delete()`}
+  ],
+  mistakes:[
+    `Storing the whole cart in a session dict or cookie — it breaks the moment someone clears cookies and doesn't merge cleanly on login.`,
+    `Deleting the guest cart before copying its items into the user's cart during merge.`,
+    `Letting quantity drop to 0 or negative through update_cart_item instead of clamping or deleting the row.`
+  ],
+  practices:[
+    `Model Cart/CartItem in the database from the start, even for guests — it's what makes clean merging possible.`,
+    `Connect the merge logic to user_logged_in so it fires no matter which view handles login.`
+  ],
+  tips:[`unique_together on (cart, variant) means get_or_create on CartItem does the "increment if it exists" logic for you automatically.`],
+  quickRef:{title:'Cart Operations (CRUD)', headers:['Action','Django operation'], rows:[
+    [`Add item (Create)`, `CartItem.objects.get_or_create(...)`],
+    [`View cart (Read)`, `cart.items.select_related('variant')`],
+    [`Change quantity (Update)`, `item.quantity = n; item.save()`],
+    [`Remove item (Delete)`, `item.delete()`],
+    [`Merge on login`, `user_logged_in signal receiver`]
+  ]},
+  summary:`The cart is the one piece of state that has to survive a login event without losing anything — model it as real rows, not session magic, and the merge takes care of itself.`
+},
+{
+  id:'identity-auth', num:22, title:'Identity & Authentication', icon:'🪪', time:'11 min', part:'E-Commerce Case Study',
+  purpose:`Replace Django's default User model with a custom, email-based one before your first migration, then add a private dashboard and a full self-service password reset flow.`,
+  checklist:[
+    `Create a custom user model BEFORE running your first migrate`,
+    `Point AUTH_USER_MODEL at it immediately`,
+    `Write a custom manager so createsuperuser works with email`,
+    `Build a dashboard: order history, order detail, edit profile, change password`,
+    `Wire up Django's built-in password-reset-by-email views`
+  ],
+  commands:[
+    {cmd:`python manage.py makemigrations accounts`, desc:`Migrations for the custom user model`},
+    {cmd:`python manage.py migrate`, desc:`Apply them — do this before any other app migrates`},
+    {cmd:`python manage.py createsuperuser`, desc:`Now prompts for email instead of username`}
+  ],
+  explanation:`Django will only let you swap AUTH_USER_MODEL painlessly before the very first migrate — doing it later means unwinding every migration that already touched the default user table. A custom manager's create_user()/create_superuser() define exactly what "email-based login" means, and USERNAME_FIELD = 'email' is what makes authenticate() accept an email address. Password reset is almost entirely built into Django already: four views, four templates, and an EMAIL_BACKEND are the whole feature.`,
+  code:[
+    {file:`accounts/models.py`, lang:'python', code:`from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import PermissionsMixin
+from django.db import models
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('An email address is required')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=100, blank=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    objects = CustomUserManager()
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    def __str__(self):
+        return self.email`},
+    {file:`config/settings.py`, lang:'python', code:`AUTH_USER_MODEL = 'accounts.CustomUser'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')`},
+    {file:`config/urls.py`, lang:'python', code:`from django.contrib.auth import views as auth_views
+urlpatterns += [
+    path('password-reset/', auth_views.PasswordResetView.as_view(
+        template_name='accounts/password_reset.html'), name='password_reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(
+        template_name='accounts/password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+        template_name='accounts/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
+        template_name='accounts/password_reset_complete.html'), name='password_reset_complete'),
+]`}
+  ],
+  mistakes:[
+    `Adding a custom user model after the initial migrate has already run — one of the most painful mistakes to unwind in Django.`,
+    `Leaving EMAIL_BACKEND at the console default in production, so "password reset" emails only ever print to the server log.`,
+    `Forgetting that USERNAME_FIELD must be unique=True, causing a system check error at startup.`
+  ],
+  practices:[
+    `Start every new project with a custom user model, even a minimal one — it costs nothing on day one and saves a migration rebuild later.`,
+    `Use Django's built-in password reset views as-is; only override the templates, not the logic.`
+  ],
+  tips:[`In development, EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' prints reset emails straight to your terminal — no real inbox needed while you build.`],
+  quickRef:{title:'Password Reset Views (built-in)', headers:['View','Fires when'], rows:[
+    [`PasswordResetView`, `user requests a reset link`],
+    [`PasswordResetDoneView`, `confirms the email was sent`],
+    [`PasswordResetConfirmView`, `user clicks the emailed link`],
+    [`PasswordResetCompleteView`, `new password saved successfully`]
+  ]},
+  summary:`Identity is the one decision in this whole handbook that's genuinely hard to change after the fact — get the custom user model in before migration zero.`
+},
+{
+  id:'reviews', num:23, title:'Advanced Review System', icon:'⭐', time:'8 min', part:'E-Commerce Case Study',
+  purpose:`Let customers rate products in half-star increments — but only after they've actually bought the thing they're reviewing.`,
+  checklist:[
+    `Model Review with a DecimalField rating that allows halves`,
+    `Enforce one review per user per product`,
+    `Verify a completed order exists before allowing a review`,
+    `Surface an average rating on the product page`
+  ],
+  commands:[
+    {cmd:`python manage.py shell`, desc:`Test the purchase-verification query directly`}
+  ],
+  explanation:`A DecimalField with decimal_places=1 gives clean half-star ratings without floating-point drift. "Verified purchase" is just a query — does this user have a completed order containing this product — run inside the form's clean() method, so an unverified attempt fails validation with a clear message instead of silently succeeding.`,
+  code:[
+    {file:`shop/models.py`, lang:'python', code:`from decimal import Decimal
+from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+class Review(models.Model):
+    product = models.ForeignKey('shop.Product', on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.DecimalField(
+        max_digits=2, decimal_places=1,
+        validators=[MinValueValidator(Decimal('0.5')), MaxValueValidator(Decimal('5.0'))]
+    )
+    comment = models.TextField(blank=True)
+    verified_purchase = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ['product', 'user']
+        ordering = ['-created_at']`},
+    {file:`shop/forms.py`, lang:'python', code:`from django import forms
+from orders.models import OrderItem
+from .models import Review
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
+    def __init__(self, *args, user=None, product=None, **kwargs):
+        self.user = user
+        self.product = product
+        super().__init__(*args, **kwargs)
+    def clean(self):
+        cleaned = super().clean()
+        purchased = OrderItem.objects.filter(
+            order__user=self.user,
+            order__status='completed',
+            variant__product=self.product,
+        ).exists()
+        if not purchased:
+            raise forms.ValidationError('You can only review products you have purchased.')
+        return cleaned
+    def save(self, commit=True):
+        review = super().save(commit=False)
+        review.user = self.user
+        review.product = self.product
+        review.verified_purchase = True
+        if commit:
+            review.save()
+        return review`}
+  ],
+  mistakes:[
+    `Skipping the purchase check and trusting the frontend to only show the review form to buyers — anyone can POST directly to the endpoint.`,
+    `No unique_together constraint, letting one user post multiple reviews for the same product.`,
+    `Storing rating as a float instead of Decimal, producing ugly values like 4.4999999999 in aggregates.`
+  ],
+  practices:[
+    `Run purchase verification server-side, inside form validation, never only in a template conditional.`,
+    `Aggregate with Avg('rating') at query time instead of caching an average that can drift out of sync.`
+  ],
+  tips:[`Product.objects.annotate(avg_rating=Avg('reviews__rating'), review_count=Count('reviews')) gets both numbers in a single query for a product list page.`],
+  quickRef:{title:'Rating Aggregation', headers:['Expression','Returns'], rows:[
+    [`Avg('reviews__rating')`, `mean rating across all reviews`],
+    [`Count('reviews')`, `total review count`],
+    [`Count('reviews', filter=Q(...))`, `filtered count, e.g. verified-only`]
+  ]},
+  summary:`A review system is only as trustworthy as its verification step — the half-star field is cosmetic, the purchase check is what actually matters.`
+},
+{
+  id:'admin-hardening', num:24, title:'Security & Admin Hardening', icon:'🕵️', time:'8 min', part:'E-Commerce Case Study',
+  purpose:`Move the real admin off the predictable /admin/ path, and turn the decoy left behind into a trap that logs anyone who comes looking for it.`,
+  checklist:[
+    `Relocate the live admin to a private, unguessable path`,
+    `Put a decoy view at the default /admin/ path instead`,
+    `Log every honeypot hit — attempted username, IP, timestamp`,
+    `Review honeypot logs periodically, don't just collect them`
+  ],
+  commands:[
+    {cmd:`python manage.py shell`, desc:`Query recent honeypot hits interactively`}
+  ],
+  explanation:`This is the same well-known, defensive pattern behind packages like django-admin-honeypot — not a way to attack anything. Automated bots and opportunistic scanners overwhelmingly try the default /admin/ path first; putting a decoy login there that quietly records what was attempted gives you an early warning system, while your real admin lives somewhere they'd have to already know to find.`,
+  code:[
+    {file:`accounts/models.py`, lang:'python', code:`from django.db import models
+class LoginAttempt(models.Model):
+    attempted_username = models.CharField(max_length=150)
+    ip_address = models.GenericIPAddressField()
+    user_agent = models.CharField(max_length=300, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering = ['-created_at']`},
+    {file:`accounts/views.py`, lang:'python', code:`from django.shortcuts import render
+from .models import LoginAttempt
+def honeypot_login(request):
+    if request.method == 'POST':
+        LoginAttempt.objects.create(
+            attempted_username=request.POST.get('username', '')[:150],
+            ip_address=request.META.get('REMOTE_ADDR', ''),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')[:300],
+        )
+    return render(request, 'accounts/honeypot_login.html')`},
+    {file:`config/urls.py`, lang:'python', code:`from decouple import config
+from accounts.views import honeypot_login
+urlpatterns = [
+    path('admin/', honeypot_login, name='honeypot'),
+    path(config('ADMIN_URL', default='secure-login/'), admin.site.urls),
+    # ...the rest of your urlpatterns
+]`}
+  ],
+  mistakes:[
+    `Keeping ADMIN_URL guessable (like /staff/ or /manage/) — the whole point is unpredictability.`,
+    `Logging only the attempted username and not the IP address, losing the ability to actually block repeat offenders.`,
+    `Never acting on the log — a honeypot only helps if someone reviews or alerts on what it catches.`
+  ],
+  practices:[
+    `Store ADMIN_URL in an environment variable, never hardcoded or committed, and rotate it if you suspect it's leaked.`,
+    `Pair the honeypot with real rate-limiting (e.g. django-axes) on the actual admin login, not just logging on the fake one.`
+  ],
+  tips:[`Disallow the honeypot path in robots.txt — ironically, that means only bots ignoring robots.txt (the ones worth watching) will hit it.`],
+  quickRef:{title:'Admin Hardening Checklist', headers:['Step','Why'], rows:[
+    [`Move admin off /admin/`, `default path is the first thing bots try`],
+    [`Add a honeypot at /admin/`, `turns probing into signal, not noise`],
+    [`Log IP + user agent`, `makes the log actually actionable`],
+    [`Rate-limit real login`, `stops brute-force even if the path leaks`]
+  ]},
+  summary:`None of this replaces strong passwords or two-factor auth — it buys you visibility into who's probing, and real friction against the laziest attackers.`
+},
+{
+  id:'payments', num:25, title:'Payment Processing', icon:'💳', time:'9 min', part:'E-Commerce Case Study',
+  purpose:`Take a cart to a real, verified payment using PayPal's sandbox — and never trust the browser's word that a payment succeeded.`,
+  checklist:[
+    `Snapshot the cart into an Order and OrderItem rows at checkout`,
+    `Create a PayPal order server-side via the REST API`,
+    `Capture the payment server-side after customer approval`,
+    `Verify the capture status before marking the order paid`
+  ],
+  commands:[
+    {cmd:`pip install paypal-checkout-serversdk`, desc:`Install PayPal's server SDK`}
+  ],
+  explanation:`The parts that matter are always server-to-server: your server asks PayPal to create an order, the customer approves it in a PayPal-hosted widget, and then your server — not the browser — calls PayPal again to capture the payment and check the result. Anything that only trusts a redirect URL or a client-side "success" callback can be spoofed; the capture response is the only thing worth trusting.`,
+  code:[
+    {file:`orders/models.py`, lang:'python', code:`from django.conf import settings
+from django.db import models
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('paid', 'Paid'),
+        ('shipped', 'Shipped'),
+        ('completed', 'Completed'),
+    ]
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    paypal_order_id = models.CharField(max_length=100, blank=True)
+    total = models.DecimalField(max_digits=9, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    variant = models.ForeignKey('shop.ProductVariant', on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField()
+    price_at_purchase = models.DecimalField(max_digits=8, decimal_places=2)`},
+    {file:`orders/views.py`, lang:'python', code:`from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from paypalcheckoutsdk.orders import OrdersCreateRequest, OrdersCaptureRequest
+from .paypal_client import paypal_client
+from .models import Order
+@require_POST
+def create_paypal_order(request, order_id):
+    order = Order.objects.get(id=order_id, user=request.user)
+    req = OrdersCreateRequest()
+    req.request_body({
+        'intent': 'CAPTURE',
+        'purchase_units': [{'amount': {'currency_code': 'USD', 'value': str(order.total)}}],
+    })
+    response = paypal_client().execute(req)
+    order.paypal_order_id = response.result.id
+    order.save()
+    return JsonResponse({'id': response.result.id})
+@require_POST
+def capture_paypal_order(request, order_id):
+    order = Order.objects.get(id=order_id, user=request.user)
+    req = OrdersCaptureRequest(order.paypal_order_id)
+    response = paypal_client().execute(req)
+    if response.result.status == 'COMPLETED':
+        order.status = 'paid'
+        order.save()
+        return JsonResponse({'status': 'paid'})
+    return JsonResponse({'status': 'failed'}, status=402)`}
+  ],
+  mistakes:[
+    `Marking an order "paid" as soon as the browser redirects back from PayPal, without a server-side capture check.`,
+    `Storing PayPal client secrets in settings.py instead of environment variables.`,
+    `Recomputing the total from live product prices at capture time instead of the OrderItem snapshot taken at checkout.`
+  ],
+  practices:[
+    `Snapshot price_at_purchase on each OrderItem at checkout — never rely on the live Product price for historical orders.`,
+    `Treat response.result.status == 'COMPLETED' from the capture call as the only source of truth for "this order is paid".`
+  ],
+  tips:[`Build the entire flow in PayPal's sandbox with test buyer accounts first; only swap in live credentials once create → approve → capture works end to end.`],
+  quickRef:{title:'Order Status Flow', headers:['Status','Set when'], rows:[
+    [`pending`, `order created, payment not yet captured`],
+    [`paid`, `PayPal capture returned COMPLETED`],
+    [`shipped`, `fulfillment marks it sent`],
+    [`completed`, `delivered / return window closed`]
+  ]},
+  summary:`Everything upstream — catalog, cart, reviews — exists to get a customer to this moment; verify the payment server-side and the rest of the order lifecycle can trust that status field completely.`
+},
+{
+  id:'testing', num:26, title:'Testing & Quality', icon:'🧪', time:'10 min', part:'Professional Delivery',
+  purpose:`Add fast feedback before code reaches users: test models, forms, views, APIs, permissions, and the important business paths that can actually break an order flow.`,
+  checklist:[
+    `Run Django system checks before debugging deeper failures`,
+    `Create tests beside the app they belong to`,
+    `Test happy paths and at least one important failure path`,
+    `Keep authentication and permission checks covered`,
+    `Run the full test suite before every meaningful release`
+  ],
+  commands:[
+    {cmd:`python manage.py check`, desc:`Run Django configuration checks`},
+    {cmd:`python manage.py test`, desc:`Run the complete test suite`},
+    {cmd:`python manage.py test shop.tests`, desc:`Run one test module`},
+    {cmd:`python manage.py test shop.tests.TestProduct`, desc:`Run one test class`}
+  ],
+  explanation:`Good Django tests are usually small and focused. Start with behavior that has a clear business rule: a product can be created, an unauthenticated user cannot access a protected page, a cart total is calculated correctly, and a checkout request cannot trust a client-supplied price. Prefer stable assertions over brittle checks on implementation details.`,
+  code:[
+    {file:`shop/tests/test_models.py`, lang:'python', code:`from django.test import TestCase
+from shop.models import Product
+
+class ProductModelTests(TestCase):
+    def test_product_string_is_readable(self):
+        product = Product.objects.create(
+            product_name="Chocolate Cake",
+            price=499,
+        )
+
+        self.assertEqual(str(product), "Chocolate Cake")
+        self.assertGreater(product.price, 0)`},
+    {file:`shop/tests/test_views.py`, lang:'python', code:`from django.urls import reverse
+from django.test import TestCase
+
+class StoreViewTests(TestCase):
+    def test_store_page_loads(self):
+        response = self.client.get(reverse("store"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "shop/store.html")`}
+  ],
+  mistakes:[
+    `Testing only whether a page returns 200 while never testing the business result`,
+    `Using production data or real credentials inside tests`,
+    `Writing one enormous test that becomes difficult to diagnose when it fails`
+  ],
+  practices:[
+    `Keep tests deterministic and independent of execution order.`,
+    `Name tests after the behavior they protect, not after the implementation detail.`,
+    `Run the smallest relevant test while developing, then run the complete suite before merging.`
+  ],
+  tips:[`For e-commerce flows, a few high-value end-to-end-style tests around cart, checkout, payment callback handling, and order creation give you much stronger confidence than hundreds of shallow template assertions.`],
+  quickRef:{title:'Testing Loop', headers:['Stage','Action'], rows:[
+    ['1. Check','python manage.py check'], ['2. Focus','Run the smallest failing test'], ['3. Fix','Change one behavior at a time'], ['4. Full suite','python manage.py test'], ['5. Release','Run checks again in CI']
+  ]},
+  summary:`Make the important behavior executable as a test. That turns future refactors from guesswork into a repeatable feedback loop.`
+},
+{
+  id:'docker', num:27, title:'Docker & PostgreSQL', icon:'🐳', time:'12 min', part:'Professional Delivery',
+  purpose:`Make the local stack reproducible: Django, PostgreSQL, environment variables, and supporting services should start in a predictable way on another machine.`,
+  checklist:[
+    `Keep secrets and database credentials in environment variables`,
+    `Use PostgreSQL locally when it matches the production stack`,
+    `Create a Dockerfile for the Django application`,
+    `Define services with docker compose`,
+    `Run migrations against the containerized database`
+  ],
+  commands:[
+    {cmd:`docker compose up --build`, desc:`Build and start the stack`},
+    {cmd:`docker compose ps`, desc:`See running services`},
+    {cmd:`docker compose exec web python manage.py migrate`, desc:`Apply migrations inside the web container`},
+    {cmd:`docker compose down`, desc:`Stop and remove the stack`}
+  ],
+  explanation:`The goal of Docker here is consistency rather than complexity. A compose file can describe the application and database together, while environment variables keep machine-specific configuration outside source control. For production, use a managed PostgreSQL service or a properly operated database rather than treating a development container as a database backup strategy.`,
+  code:[
+    {file:`Dockerfile`, lang:'dockerfile', code:`FROM python:3.13-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+EXPOSE 8000
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]`},
+    {file:`compose.yaml`, lang:'yaml', code:`services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: bakery
+      POSTGRES_USER: bakery_user
+      POSTGRES_PASSWORD: change-me
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:`}
+  ],
+  mistakes:[
+    `Hard-coding production passwords in compose files committed to Git`,
+    `Assuming depends_on means the database is ready to accept connections`,
+    `Treating a local volume as a reliable backup of important production data`
+  ],
+  practices:[
+    `Use a .env or secret-management strategy for credentials.`,
+    `Pin important base images instead of depending blindly on latest tags.`,
+    `Document the one-command local startup path for the project.`
+  ],
+  tips:[`Keep a tiny README section with the exact sequence: copy env file → docker compose up --build → migrate → create superuser → open localhost. That removes a lot of setup friction for collaborators.`],
+  quickRef:{title:'Container Workflow', headers:['Need','Command'], rows:[
+    ['Start','docker compose up --build'], ['Inspect','docker compose ps'], ['Django shell','docker compose exec web python manage.py shell'], ['Migrate','docker compose exec web python manage.py migrate'], ['Stop','docker compose down']
+  ]},
+  summary:`Containerize the workflow that benefits from consistency, but keep secrets, persistence, and production operations as deliberate infrastructure decisions.`
+},
+{
+  id:'cicd', num:28, title:'CI/CD & Release Checklist', icon:'🚀', time:'10 min', part:'Professional Delivery',
+  purpose:`Automate the boring verification steps so every push can prove the project still installs, checks, and tests correctly before deployment.`,
+  checklist:[
+    `Install dependencies in a clean CI environment`,
+    `Run Django checks and the test suite`,
+    `Build static assets as part of the deployment workflow`,
+    `Apply database migrations in the correct release stage`,
+    `Verify the deployed application with a smoke test and logs`
+  ],
+  commands:[
+    {cmd:`python manage.py check --deploy`, desc:`Run deployment-oriented Django checks`},
+    {cmd:`python manage.py collectstatic --noinput`, desc:`Collect static files for deployment`},
+    {cmd:`git status`, desc:`Confirm the working tree before release`},
+    {cmd:`git tag v1.0.0`, desc:`Create a version marker for a release`}
+  ],
+  explanation:`CI should catch problems before deployment; CD should make the release procedure predictable. Keep the pipeline close to the commands developers already run locally. A useful first pipeline is deliberately boring: install, check, test, build, then deploy through the hosting platform's supported mechanism.`,
+  code:[
+    {file:`.github/workflows/ci.yml`, lang:'yaml', code:`name: Django CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - run: python manage.py check
+      - run: python manage.py test`},
+    {file:`release-checklist.md`, lang:'markdown', code:`## Before release
+
+- [ ] CI is green
+- [ ] Migrations are reviewed
+- [ ] Static files build successfully
+- [ ] Environment variables exist in the target environment
+- [ ] Database backup / rollback plan is known
+- [ ] Smoke test is ready
+- [ ] Logs and error reporting are visible`}
+  ],
+  mistakes:[
+    `Deploying directly from an unreviewed local working tree`,
+    `Running migrations manually without knowing which release they belong to`,
+    `Having CI that checks style but never exercises application behavior`
+  ],
+  practices:[
+    `Keep CI reproducible and fast enough that developers actually wait for it.`,
+    `Use environment-specific configuration instead of editing source before deployment.`,
+    `Make rollback and migration safety part of the release conversation, not an emergency-only topic.`
+  ],
+  tips:[`A strong first deployment pipeline is not the most complicated one. It is the one whose commands a new contributor can understand and run locally without needing a hidden tribal-knowledge step.`],
+  quickRef:{title:'Release Gate', headers:['Gate','Question'], rows:[
+    ['Code','Is the intended commit deployed?'], ['CI','Did install, checks, and tests pass?'], ['Config','Are target environment variables present?'], ['Data','Are migrations reviewed and safe?'], ['Runtime','Can you verify health through logs or a smoke test?']
+  ]},
+  summary:`Automate verification, make deployment repeatable, and make the release state observable. That is the foundation for scaling a Django project beyond local development.`
+}
+];
+const heroPills = [
+  {icon:'🗺️', text:'Workflow + E-Commerce Build'},
+  {icon:'🐍', text:'Python 3.13'},
+  {icon:'🎸', text:'Django 5.2 LTS'},
+  {icon:'📈', text:'Beginner → Advanced'},
+  {icon:'⏱️', text:'~4 hr read'},
+  {icon:'💻', text:'250+ Examples'},
+  {icon:'📚', text:'28 Sections'},
+  {icon:'🗓️', text:'Updated Oct 2026'}
+];
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[m]));
+}
+/* ============================================================
+   RENDER FUNCTIONS
+   ============================================================ */
+function renderHeroPills(){
+  return heroPills.map(p => `<span class="pill"><span class="pill-icon">${p.icon}</span>${p.text}</span>`).join('');
+}
+function renderChecklist(sectionId, items){
+  return `<ul class="checklist">${items.map((it,i)=>`
+    <li class="checklist-item" data-section="${sectionId}">
+      <span class="check-box" role="checkbox" aria-checked="false" tabindex="0" onclick="toggleCheck(this)"></span>
+      <span class="check-text">${it}</span>
+    </li>`).join('')}</ul>`;
+}
+function renderCommands(cmds){
+  return `<div class="cmd-list">${cmds.map(c=>`
+    <div class="cmd-row">
+      <code class="cmd-code">${escapeHtml(c.cmd)}</code>
+      <span class="cmd-desc">${c.desc}</span>
+    </div>`).join('')}</div>`;
+}
+function renderCode(examples){
+  return examples.map(ex=>{
+    const lineCount = ex.code.split('\n').length;
+    const gutter = Array.from({length:lineCount}, (_,i)=>i+1).join('\n');
+    return `
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-file">📄 ${ex.file}</span>
+        <span class="code-lang">${ex.lang.toUpperCase()}</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <div class="code-body">
+        <pre class="code-gutter">${gutter}</pre>
+        <pre class="code-pre"><code class="language-${ex.lang}">${escapeHtml(ex.code)}</code></pre>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderCallout(type, icon, label, items){
+  if(!items || items.length === 0) return '';
+  return `
+    <div class="callout callout-${type}">
+      <div class="callout-head"><span>${icon}</span><span>${label}</span></div>
+      <ul class="callout-list">${items.map(i=>`<li>${i}</li>`).join('')}</ul>
+    </div>`;
+}
+function renderQuickRef(qr){
+  return `
+    <div class="quickref-card">
+      <h4 class="quickref-title">📎 ${qr.title}</h4>
+      <div class="table-wrap">
+        <table class="premium-table">
+          <thead><tr>${qr.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+          <tbody>${qr.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+function renderSection(s){
+  return `
+  <section class="section-card reveal" id="${s.id}">
+    <div class="section-top">
+      <span class="section-num">${String(s.num).padStart(2,'0')} / ${sections.length}</span>
+      <span class="badge-time">⏱ ${s.time} read</span>
+    </div>
+    <div class="section-headline">
+      <h2>${s.icon} ${s.title}</h2>
+      <div class="section-actions">
+        <button class="section-btn bookmark-btn" data-id="${s.id}" type="button" onclick="toggleBookmark('${s.id}')" title="Bookmark section">☆</button>
+        <button class="section-btn" type="button" onclick="copySectionLink('${s.id}')" title="Copy section link">🔗</button>
+        <button class="section-btn" type="button" onclick="toggleNotes('${s.id}')" title="Open personal notes">📝</button>
+      </div>
+    </div>
+    <hr class="divider">
+    <p class="section-purpose"><strong>Purpose —</strong> ${s.purpose}</p>
+    <h4 class="subhead">✅ Developer Checklist <span class="section-status" data-status-for="${s.id}">0/${s.checklist.length}</span></h4>
+    ${renderChecklist(s.id, s.checklist)}
+    <h4 class="subhead">⌨️ Commands</h4>
+    ${renderCommands(s.commands)}
+    <h4 class="subhead">💡 Explanation</h4>
+    <p class="section-explanation">${s.explanation}</p>
+    <h4 class="subhead">💻 Code Examples</h4>
+    ${renderCode(s.code)}
+    ${renderCallout('mistake','❌','Common Mistakes', s.mistakes)}
+    ${renderCallout('practice','🎯','Best Practices', s.practices)}
+    ${renderCallout('tip','🚀','Pro Tips', s.tips)}
+    ${renderQuickRef(s.quickRef)}
+    <div class="notes-panel" id="notes-${s.id}" hidden>
+      <div class="notes-head"><strong>Personal Notes</strong><span>Saved locally in this browser</span></div>
+      <textarea class="notes-area" id="notes-area-${s.id}" placeholder="Write your own takeaways, commands to try, bugs to revisit, or interview questions…"></textarea>
+      <div class="notes-actions"><button class="mini-btn" type="button" onclick="saveNote('${s.id}')">Save note</button><button class="mini-btn" type="button" onclick="toggleNotes('${s.id}')">Close</button></div>
+    </div>
+    <p class="section-summary">📌 <strong>Summary —</strong> ${s.summary}</p>
+  </section>`;
+}
+function renderSidebarNav(){
+  let html = '';
+  let lastPart = sections[0].part || 'Core Workflow';
+  sections.forEach(s=>{
+    const part = s.part || 'Core Workflow';
+    if(part !== lastPart){
+      html += `<div class="sidebar-divider"><span>${part}</span></div>`;
+      lastPart = part;
+    }
+    html += `
+    <a href="#${s.id}" class="nav-link" data-id="${s.id}">
+      <span class="nav-num">${s.num}</span>
+      <span class="nav-icon">${s.icon}</span>
+      <span class="nav-text">${s.title}</span>
+    </a>`;
+  });
+  return html;
+}
+function renderRoadmap(){
+  let html = '';
+  let lastPart = sections[0].part || 'Core Workflow';
+  sections.forEach((s,i)=>{
+    const part = s.part || 'Core Workflow';
+    if(part !== lastPart){
+      html += `<div class="roadmap-divider">🧵 ${part}</div>`;
+      lastPart = part;
+    }
+    html += `
+    <div class="roadmap-item" data-id="${s.id}" role="button" tabindex="0" onclick="scrollToSection('${s.id}')">
+      <div class="roadmap-node">
+        <div class="roadmap-circle">${s.num}</div>
+        ${i < sections.length-1 ? '<div class="roadmap-line"></div>' : ''}
+      </div>
+      <div class="roadmap-label">
+        <span class="roadmap-label-title"><span>${s.icon}</span><span>${s.title}</span></span>
+        <span class="roadmap-label-sub">${s.time} read</span>
+      </div>
+    </div>`;
+  });
+  return html;
+}
+function renderTOC(){
+  let html = '';
+  let lastPart = sections[0].part || 'Core Workflow';
+  sections.forEach(s=>{
+    const part = s.part || 'Core Workflow';
+    if(part !== lastPart){
+      html += `<div class="toc-divider">${part}</div>`;
+      lastPart = part;
+    }
+    html += `
+    <a href="#${s.id}" class="toc-item">
+      <span class="toc-arrow">→</span>
+      <span class="toc-num">${String(s.num).padStart(2,'0')}</span>
+      <span class="toc-title">${s.title}</span>
+      <span class="toc-time">${s.time}</span>
+    </a>`;
+  });
+  return html;
+}
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+function getProgressState(){
+  try { return JSON.parse(localStorage.getItem('djangoHandbookProgress') || '{}'); }
+  catch(e){ return {}; }
+}
+function saveProgressState(state){
+  localStorage.setItem('djangoHandbookProgress', JSON.stringify(state));
+}
+function persistChecks(){
+  const state = getProgressState();
+  state.checks = {};
+  document.querySelectorAll('.checklist-item').forEach(item=>{
+    const box = item.querySelector('.check-box');
+    if(box && box.classList.contains('checked')) state.checks[item.dataset.section + ':' + item.dataset.index] = true;
+  });
+  saveProgressState(state);
+}
+function updateSectionStatus(){
+  sections.forEach(s=>{
+    const card = document.getElementById(s.id);
+    if(!card) return;
+    const boxes = [...card.querySelectorAll('.check-box')];
+    const done = boxes.filter(b=>b.classList.contains('checked')).length;
+    const status = card.querySelector(`[data-status-for="${s.id}"]`);
+    if(status) status.textContent = `${done}/${boxes.length}`;
+  });
+}
+function toggleCheck(el){
+  const nowChecked = !el.classList.contains('checked');
+  el.classList.toggle('checked', nowChecked);
+  el.setAttribute('aria-checked', String(nowChecked));
+  el.parentElement.classList.toggle('done', nowChecked);
+  persistChecks();
+  updateRoadmapProgress();
+  updateDashboard();
+}
+function isSectionComplete(sectionId){
+  const card = document.getElementById(sectionId);
+  if(!card) return false;
+  const boxes = card.querySelectorAll('.check-box');
+  if(boxes.length === 0) return false;
+  return Array.from(boxes).every(b => b.classList.contains('checked'));
+}
+function updateRoadmapProgress(){
+  sections.forEach(s=>{
+    const item = document.querySelector(`.roadmap-item[data-id="${s.id}"]`);
+    if(item) item.classList.toggle('done', isSectionComplete(s.id));
+    const nav = document.querySelector(`.nav-link[data-id="${s.id}"]`);
+    if(nav) nav.classList.toggle('completed', isSectionComplete(s.id));
+  });
+  updateSectionStatus();
+}
+function restoreProgress(){
+  const state = getProgressState();
+  document.querySelectorAll('.checklist-item').forEach(item=>{
+    const key = item.dataset.section + ':' + item.dataset.index;
+    if(state.checks && state.checks[key]){
+      const box = item.querySelector('.check-box');
+      box.classList.add('checked');
+      box.setAttribute('aria-checked','true');
+      item.classList.add('done');
+    }
+  });
+  document.querySelectorAll('.section-card').forEach(card=>{
+    const id = card.id;
+    const note = state.notes && state.notes[id];
+    if(note){
+      const area = card.querySelector('.notes-area');
+      if(area) area.value = note;
+    }
+  });
+  updateRoadmapProgress();
+  updateDashboard();
+  Object.keys(state.bookmarks || {}).forEach(id=>{ if(state.bookmarks[id]) applyBookmark(id,true); });
+}
+function applyBookmark(id, active){
+  const card = document.getElementById(id);
+  const btn = document.querySelector(`.bookmark-btn[data-id="${id}"]`);
+  if(card) card.classList.toggle('bookmarked', active);
+  if(btn){ btn.textContent = active ? '★' : '☆'; btn.classList.toggle('active', active); }
+  const nav = document.querySelector(`.nav-link[data-id="${id}"]`);
+  if(nav) nav.classList.toggle('bookmarked-nav', active);
+}
+function toggleBookmark(id){
+  const state = getProgressState();
+  state.bookmarks = state.bookmarks || {};
+  state.bookmarks[id] = !state.bookmarks[id];
+  saveProgressState(state);
+  applyBookmark(id, state.bookmarks[id]);
+}
+function toggleNotes(id){
+  const panel = document.getElementById(`notes-${id}`);
+  if(panel) panel.hidden = !panel.hidden;
+}
+function saveNote(id){
+  const state = getProgressState();
+  state.notes = state.notes || {};
+  const area = document.getElementById(`notes-area-${id}`);
+  state.notes[id] = area ? area.value : '';
+  saveProgressState(state);
+  const btn = area?.parentElement?.querySelector('.mini-btn');
+  if(btn){ const old=btn.textContent; btn.textContent='Saved ✓'; setTimeout(()=>btn.textContent=old,1200); }
+}
+function copySectionLink(id){
+  const url = `${location.href.split('#')[0]}#${id}`;
+  const done = () => {
+    const btn = document.querySelector(`.section-card#${id} .section-actions button:nth-child(2)`);
+    if(btn){ const old=btn.textContent; btn.textContent='✓'; setTimeout(()=>btn.textContent=old,1200); }
+  };
+  if(navigator.clipboard?.writeText) navigator.clipboard.writeText(url).then(done).catch(()=>{});
+}
+function updateDashboard(){
+  const boxes = [...document.querySelectorAll('.check-box')];
+  const done = boxes.filter(b=>b.classList.contains('checked')).length;
+  const total = boxes.length || 1;
+  const pct = Math.round(done / total * 100);
+  const completedSections = sections.filter(s=>isSectionComplete(s.id)).length;
+  const totalMinutes = sections.reduce((sum,s)=>sum + parseInt(s.time,10) || 0, 0);
+  document.getElementById('statPercent').textContent = pct + '%';
+  document.getElementById('statSections').textContent = `${completedSections}/${sections.length}`;
+  document.getElementById('statChecks').textContent = `${done}/${boxes.length}`;
+  document.getElementById('statTime').textContent = `~${Math.max(1,Math.round(totalMinutes/60*10)/10)} hr`;
+  document.getElementById('dashboardProgressFill').style.width = pct + '%';
+}
+function exportProgress(){
+  const payload = {version:1, exportedAt:new Date().toISOString(), ...getProgressState()};
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'django-handbook-progress.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importProgress(){ document.getElementById('importFile').click(); }
+function handleImportFile(e){
+  const file = e.target.files?.[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      if(typeof data !== 'object' || data === null) throw new Error('Invalid');
+      saveProgressState({checks:data.checks||{}, bookmarks:data.bookmarks||{}, notes:data.notes||{}});
+      location.reload();
+    }catch(err){ alert('That file is not a valid Django handbook progress export.'); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+function resetProgress(){
+  if(!confirm('Reset all checklist progress, bookmarks, and notes for this handbook?')) return;
+  localStorage.removeItem('djangoHandbookProgress');
+  location.reload();
+}
+function copyCode(btn){
+  const code = btn.closest('.code-block').querySelector('code').textContent;
+  const done = () => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(done).catch(()=>{ btn.textContent='Press Ctrl+C'; setTimeout(()=>{btn.textContent='Copy';},1600); });
+  } else { done(); }
+}
+function scrollToSection(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function addRipple(e){
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  const size = Math.max(rect.width, rect.height);
+  ripple.className = 'ripple';
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+  btn.appendChild(ripple);
+  setTimeout(()=> ripple.remove(), 650);
+}
+function initTheme(){
+  const saved = localStorage.getItem('djangoHandbookTheme');
+  if(saved === 'dark') document.body.classList.add('dark');
+  const btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', ()=>{
+    document.body.classList.toggle('dark');
+    localStorage.setItem('djangoHandbookTheme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    btn.querySelector('span').textContent = document.body.classList.contains('dark') ? 'Light' : 'Theme';
+    btn.firstChild.textContent = document.body.classList.contains('dark') ? '☀️ ' : '🌙 ';
+  });
+}
+function initFocusMode(){
+  const btn = document.getElementById('focusBtn');
+  btn.addEventListener('click', ()=>{
+    document.body.classList.toggle('focus-mode');
+    btn.querySelector('span').textContent = document.body.classList.contains('focus-mode') ? 'Exit' : 'Focus';
+  });
+}
+function initPrint(){ document.getElementById('printBtn').addEventListener('click', ()=>window.print()); }
+function initProgressButton(){
+  document.getElementById('progressBtn').addEventListener('click', ()=>document.getElementById('progressDashboard').scrollIntoView({behavior:'smooth',block:'center'}));
+  document.getElementById('exportBtn').addEventListener('click', exportProgress);
+  document.getElementById('importBtn').addEventListener('click', importProgress);
+  document.getElementById('resetBtn').addEventListener('click', resetProgress);
+  document.getElementById('importFile').addEventListener('change', handleImportFile);
+}
+
+function initSearch(){
+  const input = document.getElementById('searchInput');
+  const noResults = document.getElementById('noResults');
+  input.addEventListener('input', ()=>{
+    const q = input.value.trim().toLowerCase();
+    const cards = document.querySelectorAll('.section-card');
+    let anyMatch = false;
+    cards.forEach(card=>{
+      const match = q === '' || card.textContent.toLowerCase().includes(q);
+      card.classList.toggle('hidden', !match);
+      if(match) anyMatch = true;
+    });
+    noResults.classList.toggle('show', !anyMatch && q !== '');
+  });
+  input.addEventListener('keydown', e=>{
+    if(e.key === 'Escape'){
+      input.value = '';
+      input.dispatchEvent(new Event('input'));
+      input.blur();
+    }
+  });
+  document.addEventListener('keydown', e=>{
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); input.focus(); input.select(); return; }
+    if(e.key === '/' && document.activeElement !== input){
+      e.preventDefault();
+      input.focus();
+    }
+  });
+}
+function initScrollSpy(){
+  const cards = document.querySelectorAll('.section-card');
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const link = document.querySelector(`.nav-link[data-id="${entry.target.id}"]`);
+      if(!link) return;
+      if(entry.isIntersecting){
+        document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-15% 0px -70% 0px', threshold:0});
+  cards.forEach(c=>observer.observe(c));
+}
+function initReveal(){
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, {threshold:0.06});
+  document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+}
+function initMobileMenu(){
+  const btn = document.getElementById('hamburgerBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const close = () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); };
+  btn.addEventListener('click', ()=>{
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+  overlay.addEventListener('click', close);
+  document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', close));
+}
+function initRipples(){
+  document.querySelectorAll('.copy-btn, .roadmap-item, .toc-item').forEach(el=>{
+    el.style.position = 'relative';
+    el.style.overflow = 'hidden';
+    el.addEventListener('click', addRipple);
+  });
+}
+function initKeyboardActivation(){
+  document.querySelectorAll('[role="button"], [role="checkbox"]').forEach(el=>{
+    el.addEventListener('keydown', e=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        el.click();
+      }
+    });
+  });
+}
+function updateProgress(){
+  const doc = document.documentElement;
+  const scrollable = doc.scrollHeight - doc.clientHeight;
+  const pct = scrollable > 0 ? (doc.scrollTop / scrollable) * 100 : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('heroPills').innerHTML = renderHeroPills();
+  document.getElementById('sidebarNav').innerHTML = renderSidebarNav();
+  document.getElementById('roadmapList').innerHTML = renderRoadmap();
+  document.getElementById('tocList').innerHTML = renderTOC();
+  document.getElementById('sectionsContainer').innerHTML = sections.map(renderSection).join('');
+  if(window.hljs){
+    document.querySelectorAll('pre code').forEach(block => {
+      try{ hljs.highlightElement(block); }catch(e){ /* language not loaded, leave as plain text */ }
+    });
+  }
+  initSearch();
+  initScrollSpy();
+  initReveal();
+  initMobileMenu();
+  initRipples();
+  initKeyboardActivation();
+  initTheme();
+  initFocusMode();
+  initPrint();
+  initProgressButton();
+  restoreProgress();
+  updateProgress();
+  window.addEventListener('scroll', updateProgress, {passive:true});
+});
+</script>
+</body>
+</html>
+

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>learning-path</title>
+<style>
+:root{
+    --bg:#0d1117;
+    --panel:#161b22;
+    --panel-hover:#1c2128;
+    --border:#30363d;
+    --text:#f0f6fc;
+    --muted:#8b949e;
+    --blue:#58a6ff;
+    --green:#3fb950;
+    --purple:#bc8cff;
+    --orange:#f0883e;
+}
+*{box-sizing:border-box}
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+.topbar{
+    height:64px;
+    background:#010409;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    padding:0 6%;
+}
+.repo{
+    font-size:19px;
+    font-weight:600;
+}
+.repo span{color:var(--muted);font-weight:400}
+main{
+    max-width:1100px;
+    margin:auto;
+    padding:45px 24px 70px;
+}
+.hero{
+    margin-bottom:35px;
+}
+.hero h1{
+    font-size:36px;
+    margin:0 0 8px;
+}
+.hero p{
+    color:var(--muted);
+    margin:0;
+    line-height:1.6;
+}
+.search{
+    margin-top:22px;
+    width:100%;
+    max-width:520px;
+    padding:11px 14px;
+    background:#010409;
+    border:1px solid var(--border);
+    border-radius:6px;
+    color:var(--text);
+    outline:none;
+}
+.search:focus{border-color:var(--blue)}
+.section{
+    margin-top:35px;
+}
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+}
+.section-title h2{
+    font-size:21px;
+    margin:0;
+}
+.badge{
+    color:var(--muted);
+    font-size:12px;
+    border:1px solid var(--border);
+    padding:3px 8px;
+    border-radius:20px;
+}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:15px;
+}
+.card{
+    display:block;
+    text-decoration:none;
+    color:var(--text);
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:20px;
+    transition:.18s;
+}
+.card:hover{
+    background:var(--panel-hover);
+    border-color:#58a6ff88;
+    transform:translateY(-2px);
+}
+.card-top{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+.icon{
+    width:42px;
+    height:42px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:8px;
+    background:#21262d;
+    font-size:21px;
+}
+.card h3{
+    margin:0;
+    font-size:16px;
+    word-break:break-word;
+}
+.card p{
+    color:var(--muted);
+    font-size:13px;
+    margin:14px 0 0;
+    line-height:1.5;
+}
+.file{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:12px;
+}
+.empty{
+    color:var(--muted);
+    padding:20px 0;
+    display:none;
+}
+.footer{
+    border-top:1px solid var(--border);
+    margin-top:55px;
+    padding-top:20px;
+    color:var(--muted);
+    font-size:13px;
+}
+@media(max-width:600px){
+    .topbar{padding:0 18px}
+    main{padding:30px 16px}
+    .hero h1{font-size:29px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="repo">nishchith-tech29 <span>/ learning-path</span></div>
+</header>
+
+<main>
+    <section class="hero">
+        <h1>Learning Path</h1>
+        <p>
+            A single place for all my learning workflows, notes and daily study material.
+            Select a workflow below to open its HTML page.
+        </p>
+        <input
+            class="search"
+            id="search"
+            type="search"
+            placeholder="Search workflows or files..."
+            oninput="filterCards()"
+        >
+    </section>
+
+    <section class="section">
+        <div class="section-title">
+            <h2>🐍 Django & Web Development</h2>
+            <span class="badge">1 file</span>
+        </div>
+
+        <div class="grid">
+            <a class="card" href="django_workflow_handbook.html" data-search="django workflow handbook web development">
+                <div class="card-top">
+                    <div class="icon">🐍</div>
+                    <h3>Django Workflow Handbook</h3>
+                </div>
+                <p>Django learning workflow, development concepts and project guidance.</p>
+                <div class="file">django_workflow_handbook.html</div>
+            </a>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-title">
+            <h2>🌐 Git & Open Source</h2>
+            <span class="badge">1 file</span>
+        </div>
+
+        <div class="grid">
+            <a class="card" href="git-github-open-source-workflow%20(2).html" data-search="git github open source workflow">
+                <div class="card-top">
+                    <div class="icon">🐙</div>
+                    <h3>Git, GitHub & Open Source Workflow</h3>
+                </div>
+                <p>Learning material for Git, GitHub and contributing to open source.</p>
+                <div class="file">git-github-open-source-workflow (2).html</div>
+            </a>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-title">
+            <h2>🧠 Deep Learning</h2>
+            <span class="badge">2 files</span>
+        </div>
+
+        <div class="grid">
+            <a class="card" href="DL_day1.html" data-search="deep learning day 1 dl">
+                <div class="card-top">
+                    <div class="icon">1</div>
+                    <h3>Deep Learning — Day 1</h3>
+                </div>
+                <p>Day 1 deep learning study material.</p>
+                <div class="file">DL_day1.html</div>
+            </a>
+
+            <a class="card" href="dl_notes%202.html" data-search="deep learning day 2 dl notes">
+                <div class="card-top">
+                    <div class="icon">2</div>
+                    <h3>Deep Learning — Day 2</h3>
+                </div>
+                <p>Day 2 deep learning notes and continuation material.</p>
+                <div class="file">dl_notes 2.html</div>
+            </a>
+        </div>
+    </section>
+
+    <div id="empty" class="empty">
+        No matching files found.
+    </div>
+
+    <footer class="footer">
+        learning-path · Open any card to view the corresponding HTML file.
+    </footer>
+</main>
+
+<script>
+function filterCards(){
+    const query=document.getElementById("search").value.toLowerCase().trim();
+    const cards=document.querySelectorAll(".card");
+    let visible=0;
+
+    cards.forEach(card=>{
+        const match=card.dataset.search.includes(query);
+        card.style.display=match ? "block" : "none";
+        if(match) visible++;
+    });
+
+    document.getElementById("empty").style.display=visible ? "none" : "block";
+}
+</script>
+
+</body>
+</html>

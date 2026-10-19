@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,9 +26,13 @@
     --radius: 14px;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
-html { scroll-behavior: smooth; }
+html {
+    scroll-behavior: smooth;
+}
 
 body {
     margin: 0;
@@ -40,7 +45,15 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-a { color: inherit; }
+a {
+    color: inherit;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* Top Navigation */
 
 .topbar {
     position: sticky;
@@ -68,6 +81,7 @@ a { color: inherit; }
 .repo-mark {
     width: 30px;
     height: 30px;
+    flex-shrink: 0;
     display: grid;
     place-items: center;
     background: var(--surface-raised);
@@ -76,8 +90,17 @@ a { color: inherit; }
     font-size: 16px;
 }
 
-.repo-name { overflow-wrap: anywhere; }
-.repo-slash, .repo-subname { color: var(--muted); font-weight: 450; }
+.repo-name {
+    overflow-wrap: anywhere;
+}
+
+.repo-slash,
+.repo-subname {
+    color: var(--muted);
+    font-weight: 450;
+}
+
+/* Main Layout */
 
 main {
     width: min(100% - 40px, 920px);
@@ -85,7 +108,9 @@ main {
     padding: 56px 0 64px;
 }
 
-.hero { margin-bottom: 30px; }
+.hero {
+    margin-bottom: 30px;
+}
 
 .eyebrow {
     display: inline-flex;
@@ -123,6 +148,8 @@ main {
     line-height: 1.75;
 }
 
+/* Search */
+
 .search-wrap {
     position: relative;
     margin-top: 25px;
@@ -152,7 +179,9 @@ main {
     transition: border-color .2s, box-shadow .2s, background .2s;
 }
 
-.search::placeholder { color: #7d8793; }
+.search::placeholder {
+    color: #7d8793;
+}
 
 .search:focus {
     border-color: var(--blue);
@@ -174,6 +203,8 @@ main {
     pointer-events: none;
 }
 
+/* Toolbar */
+
 .toolbar {
     display: flex;
     align-items: center;
@@ -190,7 +221,10 @@ main {
     text-transform: uppercase;
 }
 
-.toolbar-actions { display: flex; gap: 8px; }
+.toolbar-actions {
+    display: flex;
+    gap: 8px;
+}
 
 .text-button {
     appearance: none;
@@ -210,6 +244,13 @@ main {
     border-color: #566170;
     color: var(--text);
 }
+
+.text-button:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+}
+
+/* Categories */
 
 .categories {
     display: flex;
@@ -245,9 +286,13 @@ main {
     transition: background .18s;
 }
 
-.category-summary::-webkit-details-marker { display: none; }
+.category-summary::-webkit-details-marker {
+    display: none;
+}
 
-.category-summary:hover { background: rgba(255, 255, 255, .025); }
+.category-summary:hover {
+    background: rgba(255, 255, 255, .025);
+}
 
 .category-summary:focus-visible {
     outline: 2px solid var(--blue);
@@ -299,6 +344,7 @@ main {
 }
 
 .category-description {
+    display: block;
     margin: 5px 0 0;
     color: var(--muted);
     font-size: 12px;
@@ -334,9 +380,18 @@ main {
 }
 
 @keyframes reveal {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
+/* Resource Cards */
 
 .file-grid {
     display: grid;
@@ -413,7 +468,11 @@ main {
     overflow-wrap: anywhere;
 }
 
-.file-card:hover .file-path { color: var(--blue); }
+.file-card:hover .file-path {
+    color: var(--blue);
+}
+
+/* Empty Search State */
 
 .empty {
     display: none;
@@ -432,6 +491,8 @@ main {
     margin-bottom: 6px;
 }
 
+/* Footer */
+
 .footer {
     display: flex;
     align-items: center;
@@ -446,27 +507,83 @@ main {
     line-height: 1.6;
 }
 
-.footer-mark { color: var(--blue); }
+.footer-mark {
+    color: var(--blue);
+}
+
+/* Responsive */
 
 @media (max-width: 600px) {
-    .topbar { min-height: 58px; padding: 0 16px; }
-    main { width: calc(100% - 30px); padding: 38px 0 45px; }
-    .hero h1 { letter-spacing: -1px; }
-    .hero p { font-size: 14px; }
-    .toolbar { margin-top: 25px; }
-    .category-summary { min-height: 75px; padding: 14px; gap: 11px; }
-    .category-icon { width: 40px; height: 40px; flex-basis: 40px; font-size: 19px; }
-    .category-title { font-size: 14px; }
-    .category-description { font-size: 11px; }
-    .category-content { padding: 0 12px 12px; }
-    .file-grid { grid-template-columns: 1fr; gap: 10px; padding-top: 12px; }
-    .file-card { min-height: 132px; }
-    .search-hint { display: none; }
-    .search { padding-right: 12px; }
+    .topbar {
+        min-height: 58px;
+        padding: 0 16px;
+    }
+
+    main {
+        width: calc(100% - 30px);
+        padding: 38px 0 45px;
+    }
+
+    .hero h1 {
+        letter-spacing: -1px;
+    }
+
+    .hero p {
+        font-size: 14px;
+    }
+
+    .toolbar {
+        margin-top: 25px;
+    }
+
+    .category-summary {
+        min-height: 75px;
+        padding: 14px;
+        gap: 11px;
+    }
+
+    .category-icon {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+        font-size: 19px;
+    }
+
+    .category-title {
+        font-size: 14px;
+    }
+
+    .category-description {
+        font-size: 11px;
+    }
+
+    .category-content {
+        padding: 0 12px 12px;
+    }
+
+    .file-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding-top: 12px;
+    }
+
+    .file-card {
+        min-height: 132px;
+    }
+
+    .search-hint {
+        display: none;
+    }
+
+    .search {
+        padding-right: 12px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
         scroll-behavior: auto !important;
         animation-duration: .01ms !important;
         transition-duration: .01ms !important;
@@ -476,6 +593,7 @@ main {
 </head>
 
 <body>
+
 <header class="topbar">
     <div class="repo">
         <span class="repo-mark" aria-hidden="true">⌘</span>
@@ -486,9 +604,15 @@ main {
 </header>
 
 <main>
+
     <section class="hero">
-        <div class="eyebrow"><span class="eyebrow-dot"></span> Personal knowledge hub</div>
+        <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            Personal knowledge hub
+        </div>
+
         <h1>Learning Path</h1>
+
         <p>
             Your central hub for learning workflows, technical notes, and daily study material.
             Open a category to explore its resources.
@@ -496,6 +620,7 @@ main {
 
         <div class="search-wrap">
             <span class="search-icon" aria-hidden="true">⌕</span>
+
             <input
                 class="search"
                 id="search"
@@ -504,15 +629,22 @@ main {
                 aria-label="Search topics, workflows, or files"
                 autocomplete="off"
             >
+
             <span class="search-hint" aria-hidden="true">Search</span>
         </div>
     </section>
 
     <div class="toolbar">
         <span class="toolbar-label">Your resources</span>
+
         <div class="toolbar-actions">
-            <button class="text-button" id="expand-all" type="button">Expand all</button>
-            <button class="text-button" id="collapse-all" type="button">Collapse all</button>
+            <button class="text-button" id="expand-all" type="button">
+                Expand all
+            </button>
+
+            <button class="text-button" id="collapse-all" type="button">
+                Collapse all
+            </button>
         </div>
     </div>
 
@@ -522,26 +654,37 @@ main {
         <details class="category" data-category>
             <summary class="category-summary">
                 <span class="category-icon" aria-hidden="true">🐍</span>
+
                 <span class="category-main">
                     <span class="category-title-row">
                         <span class="category-title">Django &amp; Web Development</span>
                         <span class="count">1 resource</span>
                     </span>
-                    <span class="category-description">Backend development, Django workflows, and project guidance</span>
+
+                    <span class="category-description">
+                        Backend development, Django workflows, and project guidance
+                    </span>
                 </span>
+
                 <span class="chevron" aria-hidden="true">›</span>
             </summary>
 
             <div class="category-content">
                 <div class="file-grid">
-                    <a class="file-card"
-                       href="django_workflow_handbook.html"
-                       data-search="django workflow handbook web development python backend">
+                    <a
+                        class="file-card"
+                        href="django_workflow_handbook.html"
+                        data-search="django workflow handbook web development python backend"
+                    >
                         <div class="file-card-top">
                             <span class="file-icon" aria-hidden="true">🐍</span>
                             <h3 class="file-title">Django Workflow Handbook</h3>
                         </div>
-                        <p class="file-description">Django learning workflow, development concepts, and project guidance.</p>
+
+                        <p class="file-description">
+                            Django learning workflow, development concepts, and project guidance.
+                        </p>
+
                         <span class="file-path">django_workflow_handbook.html</span>
                     </a>
                 </div>
@@ -552,28 +695,39 @@ main {
         <details class="category" data-category>
             <summary class="category-summary">
                 <span class="category-icon" aria-hidden="true">🌐</span>
+
                 <span class="category-main">
                     <span class="category-title-row">
                         <span class="category-title">Natural Language Processing</span>
                         <span class="count">1 website</span>
                     </span>
-                    <span class="category-description">NLP learning resources and study material</span>
+
+                    <span class="category-description">
+                        NLP learning resources and study material
+                    </span>
                 </span>
+
                 <span class="chevron" aria-hidden="true">›</span>
             </summary>
 
             <div class="category-content">
                 <div class="file-grid">
-                    <a class="file-card"
-                       href="https://nishchith-tech29.github.io/NLP-Learning-path/"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       data-search="nlp learning path natural language processing artificial intelligence website">
+                    <a
+                        class="file-card"
+                        href="https://nishchith-tech29.github.io/NLP-Learning-path/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-search="nlp learning path natural language processing artificial intelligence website"
+                    >
                         <div class="file-card-top">
                             <span class="file-icon" aria-hidden="true">🌐</span>
                             <h3 class="file-title">NLP Learning Path</h3>
                         </div>
-                        <p class="file-description">Learning material and resources for Natural Language Processing.</p>
+
+                        <p class="file-description">
+                            Learning material and resources for Natural Language Processing.
+                        </p>
+
                         <span class="file-path">Open NLP Learning Path ↗</span>
                     </a>
                 </div>
@@ -584,26 +738,37 @@ main {
         <details class="category" data-category>
             <summary class="category-summary">
                 <span class="category-icon" aria-hidden="true">🌍</span>
+
                 <span class="category-main">
                     <span class="category-title-row">
                         <span class="category-title">Git &amp; Open Source</span>
                         <span class="count">1 resource</span>
                     </span>
-                    <span class="category-description">Git, GitHub workflows, and open-source contributions</span>
+
+                    <span class="category-description">
+                        Git, GitHub workflows, and open-source contributions
+                    </span>
                 </span>
+
                 <span class="chevron" aria-hidden="true">›</span>
             </summary>
 
             <div class="category-content">
                 <div class="file-grid">
-                    <a class="file-card"
-                       href="git-github-open-source-workflow%20(2).html"
-                       data-search="git github open source workflow version control contribution">
+                    <a
+                        class="file-card"
+                        href="git-github-open-source-workflow%20(2).html"
+                        data-search="git github open source workflow version control contribution"
+                    >
                         <div class="file-card-top">
                             <span class="file-icon" aria-hidden="true">🐙</span>
                             <h3 class="file-title">Git, GitHub &amp; Open Source Workflow</h3>
                         </div>
-                        <p class="file-description">Learning material for Git, GitHub, version control, and contributing to open source.</p>
+
+                        <p class="file-description">
+                            Learning material for Git, GitHub, version control, and contributing to open source.
+                        </p>
+
                         <span class="file-path">git-github-open-source-workflow (2).html</span>
                     </a>
                 </div>
@@ -614,37 +779,54 @@ main {
         <details class="category" data-category>
             <summary class="category-summary">
                 <span class="category-icon" aria-hidden="true">🧠</span>
+
                 <span class="category-main">
                     <span class="category-title-row">
                         <span class="category-title">Deep Learning</span>
                         <span class="count">2 resources</span>
                     </span>
-                    <span class="category-description">Daily notes and study material for deep learning</span>
+
+                    <span class="category-description">
+                        Daily notes and study material for deep learning
+                    </span>
                 </span>
+
                 <span class="chevron" aria-hidden="true">›</span>
             </summary>
 
             <div class="category-content">
                 <div class="file-grid">
-                    <a class="file-card"
-                       href="DL_day1.html"
-                       data-search="deep learning day 1 dl neural networks">
+                    <a
+                        class="file-card"
+                        href="DL_day1.html"
+                        data-search="deep learning day 1 dl neural networks"
+                    >
                         <div class="file-card-top">
                             <span class="file-icon" aria-hidden="true">1</span>
                             <h3 class="file-title">Deep Learning — Day 1</h3>
                         </div>
-                        <p class="file-description">Day 1 deep learning study material.</p>
+
+                        <p class="file-description">
+                            Day 1 deep learning study material.
+                        </p>
+
                         <span class="file-path">DL_day1.html</span>
                     </a>
 
-                    <a class="file-card"
-                       href="dl_notes%202.html"
-                       data-search="deep learning day 2 dl notes neural networks">
+                    <a
+                        class="file-card"
+                        href="dl_notes%202.html"
+                        data-search="deep learning day 2 dl notes neural networks"
+                    >
                         <div class="file-card-top">
                             <span class="file-icon" aria-hidden="true">2</span>
                             <h3 class="file-title">Deep Learning — Day 2</h3>
                         </div>
-                        <p class="file-description">Day 2 deep learning notes and continuation material.</p>
+
+                        <p class="file-description">
+                            Day 2 deep learning notes and continuation material.
+                        </p>
+
                         <span class="file-path">dl_notes 2.html</span>
                     </a>
                 </div>
@@ -655,55 +837,107 @@ main {
         <details class="category" data-category>
             <summary class="category-summary">
                 <span class="category-icon" aria-hidden="true">⚙️</span>
+
                 <span class="category-main">
                     <span class="category-title-row">
                         <span class="category-title">Backend from First Principles</span>
-                        <span class="count">3 resources</span>
+                        <span class="count">4 resources</span>
                     </span>
-                    <span class="category-description">Understand how the web and backend systems work, from the fundamentals up</span>
+
+                    <span class="category-description">
+                        Understand how the web and backend systems work, from the fundamentals up
+                    </span>
                 </span>
+
                 <span class="chevron" aria-hidden="true">›</span>
             </summary>
 
             <div class="category-content">
                 <div class="file-grid">
-                    <a class="file-card"
-                       href="B1.html"
-                       data-search="backend from first principles backend fundamentals server client how backend works why need backend">
+
+                    <!-- B1 -->
+                    <a
+                        class="file-card"
+                        href="B1.html"
+                        data-search="backend from first principles backend fundamentals server client how backend works why need backend"
+                    >
                         <div class="file-card-top">
                             <span class="file-icon" aria-hidden="true">1</span>
-                            <h3 class="file-title">What Is a Backend, How Does It Work, and Why Do We Need It?</h3>
+                            <h3 class="file-title">
+                                What Is a Backend, How Does It Work, and Why Do We Need It?
+                            </h3>
                         </div>
-                        <p class="file-description">Learn what a backend is, how it works, and why applications need one.</p>
+
+                        <p class="file-description">
+                            Learn what a backend is, how it works, and why applications need one.
+                        </p>
+
                         <span class="file-path">B1.html</span>
                     </a>
 
-                    <a class="file-card"
-                       href="B2.html"
-                       data-search="http backend engineers requests responses methods status codes protocol">
+                    <!-- B2 -->
+                    <a
+                        class="file-card"
+                        href="B2.html"
+                        data-search="http backend engineers requests responses methods status codes protocol"
+                    >
                         <div class="file-card-top">
                             <span class="file-icon" aria-hidden="true">2</span>
                             <h3 class="file-title">Understanding HTTP for Backend Engineers</h3>
                         </div>
-                        <p class="file-description">Explore the protocol behind web communication, requests, and responses.</p>
+
+                        <p class="file-description">
+                            Explore the protocol behind web communication, requests, methods, status codes, and responses.
+                        </p>
+
                         <span class="file-path">B2.html</span>
                     </a>
 
-                    <a class="file-card"
-                       href="B3.html"
-                       data-search="backend routing routes requests url endpoints request handling">
+                    <!-- B3 -->
+                    <a
+                        class="file-card"
+                        href="B3.html"
+                        data-search="backend routing routes requests url endpoints request handling"
+                    >
                         <div class="file-card-top">
                             <span class="file-icon" aria-hidden="true">3</span>
                             <h3 class="file-title">What Is Routing in Backend?</h3>
                         </div>
-                        <p class="file-description">Understand how incoming requests are matched to the right route and handler.</p>
+
+                        <p class="file-description">
+                            Understand how incoming requests are matched to the right route and handler.
+                        </p>
+
                         <span class="file-path">B3.html</span>
                     </a>
+
+                    <!-- B4: Serialization and Deserialization -->
+                    <a
+                        class="file-card"
+                        href="B4.html"
+                        data-search="serialization deserialization backend engineers JSON Python objects data conversion API request response"
+                    >
+                        <div class="file-card-top">
+                            <span class="file-icon" aria-hidden="true">4</span>
+                            <h3 class="file-title">
+                                Serialization and Deserialization for Backend Engineers
+                            </h3>
+                        </div>
+
+                        <p class="file-description">
+                            Learn how backend systems convert objects into transferable formats like JSON and reconstruct data when receiving requests or responses.
+                        </p>
+
+                        <span class="file-path">B4.html</span>
+                    </a>
+
                 </div>
             </div>
         </details>
+
     </div>
 
+    <!-- No Results -->
     <div class="empty" id="empty" role="status" aria-live="polite">
         <strong>No matching resources found</strong>
         Try a different search term.
@@ -713,12 +947,14 @@ main {
         <span><span class="footer-mark">◆</span> learning-path</span>
         <span>Built for focused learning · Hosted on GitHub Pages</span>
     </footer>
+
 </main>
 
 <script>
 const searchInput = document.getElementById("search");
-const categories = Array.from(document.querySelectorAll("[data-category]"));
-const cards = Array.from(document.querySelectorAll(".file-card"));
+const categories = Array.from(
+    document.querySelectorAll("[data-category]")
+);
 const emptyMessage = document.getElementById("empty");
 const expandAllButton = document.getElementById("expand-all");
 const collapseAllButton = document.getElementById("collapse-all");
@@ -728,7 +964,16 @@ function filterResources() {
     let totalMatches = 0;
 
     categories.forEach(category => {
-        const categoryCards = Array.from(category.querySelectorAll(".file-card"));
+        const categoryCards = Array.from(
+            category.querySelectorAll(".file-card")
+        );
+
+        const categoryTitle =
+            category.querySelector(".category-title")?.innerText || "";
+
+        const categoryDescription =
+            category.querySelector(".category-description")?.innerText || "";
+
         let categoryMatches = 0;
 
         categoryCards.forEach(card => {
@@ -736,11 +981,13 @@ function filterResources() {
                 card.dataset.search || "",
                 card.innerText || "",
                 card.getAttribute("href") || "",
-                category.querySelector(".category-title")?.innerText || "",
-                category.querySelector(".category-description")?.innerText || ""
+                categoryTitle,
+                categoryDescription
             ].join(" ").toLowerCase();
 
-            const matches = query === "" || searchableText.includes(query);
+            const matches =
+                query === "" || searchableText.includes(query);
+
             card.hidden = !matches;
 
             if (matches) {
@@ -758,12 +1005,15 @@ function filterResources() {
         }
     });
 
-    emptyMessage.style.display = totalMatches === 0 ? "block" : "none";
+    emptyMessage.style.display =
+        totalMatches === 0 ? "block" : "none";
 }
 
 expandAllButton.addEventListener("click", () => {
     categories.forEach(category => {
-        if (!category.hidden) category.open = true;
+        if (!category.hidden) {
+            category.open = true;
+        }
     });
 });
 
@@ -774,6 +1024,11 @@ collapseAllButton.addEventListener("click", () => {
 });
 
 searchInput.addEventListener("input", filterResources);
+
+// Initial state: all categories collapsed.
+filterResources();
 </script>
+
 </body>
 </html>
+```
